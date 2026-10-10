@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="az" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AzMİU İBİ — İnnovativ Biznes İnkubatoru</title>
+    <meta name="description" content="Azərbaycan Memarlıq və İnşaat Universiteti İnnovativ Biznes İnkubatorunun rəsmi portalı — Universitet ideyalarını real startaplara çeviririk." />
+    <meta property="og:title" content="AzMİU İBİ — İnnovativ Biznes İnkubatoru" />
+    <meta property="og:description" content="Azərbaycan Memarlıq və İnşaat Universiteti İnnovativ Biznes İnkubatorunun rəsmi portalı — Universitet ideyalarını real startaplara çeviririk." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts: Inter with full Latin-Extended Azerbaijani Glyph Support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&subset=latin-ext&display=swap" rel="stylesheet" />
+
+    <!-- FontAwesome 6 CDN for Social Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Lucide Icons Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Application Stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="bg-white text-slate-900 min-h-screen relative overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950">
+    
+    <!-- ========================================== -->
+    <!-- 1. STICKY GLASS NAVBAR                     -->
+    <!-- ========================================== -->
+    <header id="main-navbar" class="fixed top-0 w-full z-[100] backdrop-blur-lg bg-white border-b border-slate-200 transition-all">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        
+        <!-- Left: Logo & University Branding -->
+        <a href="#hero" class="flex items-center gap-3.5 group cursor-pointer focus:outline-none">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 p-[1.5px] shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+            <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
+              <i data-lucide="layers" class="w-6 h-6 text-blue-700"></i>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xl font-bold tracking-tight text-slate-950 flex items-center gap-1.5 font-heading">
+              AzMİU <span class="bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">İBİ</span>
+            </span>
+            <span data-i18n="navSubBrand" class="text-[10px] uppercase font-semibold tracking-wider text-slate-500 -mt-0.5">
+              İnnovativ Biznes İnkubatoru
+            </span>
+          </div>
+        </a>
+
+        <!-- Center: Desktop Navigation Links -->
+        <nav class="hidden lg:flex items-center gap-7">
+          <a href="#about" data-i18n="navAbout" class="text-sm font-medium text-slate-600 hover:text-blue-700 transition-colors">Haqqımızda</a>
+          <a href="#programs" data-i18n="navPrograms" class="text-sm font-medium text-slate-600 hover:text-blue-700 transition-colors">Proqramlar</a>
+          <a href="#timeline" data-i18n="navTimeline" class="text-sm font-medium text-slate-600 hover:text-blue-700 transition-colors">Yol Xəritəsi</a>
+          <a href="#startups" data-i18n="navStartups" class="text-sm font-medium text-slate-600 hover:text-blue-700 transition-colors">Startaplar</a>
+          <a href="#events" data-i18n="navEvents" class="text-sm font-medium text-slate-600 hover:text-blue-700 transition-colors">Tədbirlər</a>
+          <a href="#news" data-i18n="navNews" class="text-sm font-medium text-slate-600 hover:text-blue-700 transition-colors">Xəbərlər</a>
+          <a href="#mentors" data-i18n="navMentors" class="text-sm font-medium text-slate-600 hover:text-blue-700 transition-colors">Mentorlar</a>
+        </nav>
+
+        <!-- Right: AZ/EN Toggle + Apply CTA Button + Mobile Toggle -->
+        <div class="flex items-center gap-3 sm:gap-4">
+          <!-- Dual Language (AZ / EN) Toggle Button -->
+          <button 
+            id="lang-toggle-btn"
+            type="button"
+            data-current-lang="az"
+            class="flex items-center gap-2 px-3.5 py-2 rounded-xl backdrop-blur-md bg-white hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+            title="Dili dəyiş / Change language"
+          >
+            <i data-lucide="globe" class="w-4 h-4 text-blue-700"></i>
+            <span class="lang-az font-bold text-blue-700">AZ</span>
+            <span class="text-slate-500">|</span>
+            <span class="lang-en text-slate-500">EN</span>
+          </button>
+
+          <!-- Primary Apply Button -->
+          <button 
+            id="nav-apply-btn"
+            type="button"
+            onclick="openModal('idea')"
+            class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-950 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+          >
+            <span data-i18n="navApply">Müraciət Et</span>
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Mobile Hamburger Menu Button -->
+          <button 
+            id="mobile-menu-btn"
+            type="button"
+            class="lg:hidden p-2.5 rounded-xl text-slate-600 hover:text-slate-950 bg-white border border-slate-200 focus:outline-none"
+            aria-label="Toggle navigation menu"
+          >
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Dropdown Navigation -->
+      <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white backdrop-blur-2xl px-6 py-6 transition-all">
+        <nav class="flex flex-col gap-4 mb-6">
+          <a href="#about" data-i18n="navAbout" class="text-base font-medium text-slate-600 hover:text-blue-700">Haqqımızda</a>
+          <a href="#programs" data-i18n="navPrograms" class="text-base font-medium text-slate-600 hover:text-blue-700">Proqramlar</a>
+          <a href="#timeline" data-i18n="navTimeline" class="text-base font-medium text-slate-600 hover:text-blue-700">Yol Xəritəsi</a>
+          <a href="#startups" data-i18n="navStartups" class="text-base font-medium text-slate-600 hover:text-blue-700">Startaplar</a>
+          <a href="#events" data-i18n="navEvents" class="text-base font-medium text-slate-600 hover:text-blue-700">Tədbirlər</a>
+          <a href="#news" data-i18n="navNews" class="text-base font-medium text-slate-600 hover:text-blue-700">Xəbərlər</a>
+          <a href="#mentors" data-i18n="navMentors" class="text-base font-medium text-slate-600 hover:text-blue-700">Mentorlar</a>
+        </nav>
+        <button 
+          onclick="openModal('idea')"
+          class="w-full py-3 rounded-xl text-sm font-semibold text-slate-950 bg-gradient-to-r from-violet-600 to-cyan-500 text-center shadow-lg shadow-cyan-500/20"
+        >
+          <span data-i18n="navApply">Müraciət Et</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="relative z-10">
+
+      <!-- ========================================== -->
+      <!-- 2. HERO SECTION                           -->
+      <!-- ========================================== -->
+      <section id="hero" class="min-h-screen pt-32 pb-20 flex items-center justify-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            
+            <!-- Left Column: Tagline, Heading, Subtext, 3 Action Buttons -->
+            <div class="lg:col-span-7 flex flex-col items-start space-y-6">
+              
+              <!-- Tagline Badge -->
+              <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full backdrop-blur-md bg-white border border-cyan-500/30 text-xs font-semibold text-blue-700 shadow-sm shadow-cyan-500/10">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span data-i18n="heroBadge">İnnovasiya Eko-Sistemi — 2023-dən</span>
+              </div>
+
+              <!-- Main Heading with Gradient Accent -->
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-950 tracking-tight leading-[1.15]">
+                <span data-i18n="heroTitlePrefix">Universitet ideyalarını </span>
+                <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-violet-400 bg-clip-text text-transparent" data-i18n="heroTitleGradient">real startaplara </span>
+                <span data-i18n="heroTitleSuffix">çeviririk</span>
+              </h1>
+
+              <!-- Subtext -->
+              <p data-i18n="heroSubtext" class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
+                Azərbaycan Memarlıq və İnşaat Universitetinin tələbə, məzun və gənc tədqiqatçıları üçün inkubasiya, prototipləmə, mentorluq və toxum investisiyası platforması.
+              </p>
+
+              <!-- Unified Button System: 3 Distinct Action Buttons Row -->
+              <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2 w-full sm:w-auto">
+                <!-- 1. Gradient Primary Button -->
+                <button 
+                  id="hero-start-idea-btn"
+                  onclick="openModal('idea')"
+                  class="btn-primary px-6 py-3.5 text-sm"
+                >
+                  <span data-i18n="heroBtnStart">İdeyaya Başla</span>
+                  <i data-lucide="rocket" class="w-4 h-4 ml-2"></i>
+                </button>
+
+                <!-- 2. Glass Outline Button -->
+                <a 
+                  id="hero-explore-btn"
+                  href="#programs"
+                  class="btn-secondary px-6 py-3.5 text-sm"
+                >
+                  <span data-i18n="heroBtnExplore">Proqramları Kəşf Et</span>
+                  <i data-lucide="compass" class="w-4 h-4 text-blue-700 ml-2"></i>
+                </a>
+
+                <!-- 3. Ghost Text with Arrow Button -->
+                <a 
+                  id="hero-startups-btn"
+                  href="#startups"
+                  class="btn-ghost px-4 py-3.5 text-sm"
+                >
+                  <span data-i18n="heroBtnStartups">Startapları İzlə</span>
+                  <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1.5 transition-transform"></i>
+                </a>
+              </div>
+
+            </div>
+
+            <!-- Right Column: 6 Floating Glass Cards Grid with Increased Gap & Smooth Floats -->
+            <div class="lg:col-span-5 relative">
+              <div class="grid grid-cols-2 gap-6 sm:gap-6">
+                
+                <!-- Floating Card 1: İdeyalar -->
+                <div class="float-slow glass-panel glass-panel-hover rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xl">
+                  <div class="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-blue-700 flex items-center justify-center mb-3">
+                    <i data-lucide="lightbulb" class="w-5 h-5"></i>
+                  </div>
+                  <h4 data-i18n="cardIdeasTitle" class="text-base font-bold text-slate-950 mb-0.5">İdeyalar</h4>
+                  <p data-i18n="cardIdeasDesc" class="text-xs text-slate-600 font-semibold">180+ Təqdim edilmiş layihə</p>
+                </div>
+
+                <!-- Floating Card 2: Startaplar -->
+                <div class="float-delayed glass-panel glass-panel-hover rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xl self-center">
+                  <div class="w-10 h-10 rounded-xl bg-violet-500/15 border border-violet-500/30 text-blue-700 flex items-center justify-center mb-3">
+                    <i data-lucide="cpu" class="w-5 h-5"></i>
+                  </div>
+                  <h4 data-i18n="cardStartupsTitle" class="text-base font-bold text-slate-950 mb-0.5">Startaplar</h4>
+                  <p data-i18n="cardStartupsDesc" class="text-xs text-slate-600 font-semibold">40+ İnkubasiya məzunu</p>
+                </div>
+
+                <!-- Floating Card 3: Prototip Dəstəyi -->
+                <div class="float-fast glass-panel glass-panel-hover rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xl">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 flex items-center justify-center mb-3">
+                    <i data-lucide="wrench" class="w-5 h-5"></i>
+                  </div>
+                  <h4 data-i18n="cardImpactTitle" class="text-base font-bold text-slate-950 mb-0.5">Dəstək</h4>
+                  <p data-i18n="cardImpactDesc" class="text-xs text-slate-600 font-semibold">MVP Prototipləmə Dəstəyi</p>
+                </div>
+
+                <!-- Floating Card 4: Mentorlar -->
+                <div class="float-slow glass-panel glass-panel-hover rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xl self-center">
+                  <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-700 flex items-center justify-center mb-3">
+                    <i data-lucide="award" class="w-5 h-5"></i>
+                  </div>
+                  <h4 data-i18n="cardMentorsTitle" class="text-base font-bold text-slate-950 mb-0.5">Mentorlar</h4>
+                  <p data-i18n="cardMentorsDesc" class="text-xs text-slate-600 font-semibold">50+ Sənaye eksperti</p>
+                </div>
+
+                <!-- Floating Card 5: Şəbəkə -->
+                <div class="float-delayed glass-panel glass-panel-hover rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xl">
+                  <div class="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-700 flex items-center justify-center mb-3">
+                    <i data-lucide="network" class="w-5 h-5"></i>
+                  </div>
+                  <h4 data-i18n="cardNetworkTitle" class="text-base font-bold text-slate-950 mb-0.5">Şəbəkə</h4>
+                  <p data-i18n="cardNetworkDesc" class="text-xs text-slate-600 font-semibold">20+ Korporativ tərəfdaş</p>
+                </div>
+
+                <!-- Floating Card 6: İnkişaf -->
+                <div class="float-fast glass-panel glass-panel-hover rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xl self-center">
+                  <div class="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center mb-3">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                  </div>
+                  <h4 data-i18n="cardGrowthTitle" class="text-base font-bold text-slate-950 mb-0.5">İnkişaf</h4>
+                  <p data-i18n="cardGrowthDesc" class="text-xs text-slate-600 font-semibold">94% Layihə uğur nisbəti</p>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 3. ABOUT SECTION & STATS BAR               -->
+      <!-- ========================================== -->
+      <section id="about" class="py-20 border-t border-slate-200 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
+            
+            <div class="lg:col-span-6 space-y-6 animate-on-scroll">
+              <span data-i18n="aboutBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-blue-700 border border-cyan-500/20">
+                Haqqımızda
+              </span>
+              <h2 data-i18n="aboutTitle" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
+                Gələcəyin İnnovasiya Mərkəzi
+              </h2>
+              <p data-i18n="aboutSubtitle" class="text-base sm:text-lg text-slate-600 font-medium leading-relaxed">
+                AzMİU İnnovativ Biznes İnkubatoru memarlıq, mühəndislik, inşaat texnologiyaları və rəqəmsal həllər üzrə lider universitet startap mərkəzidir.
+              </p>
+              <p data-i18n="aboutP1" class="text-sm sm:text-base text-slate-500 leading-relaxed">
+                2023-cü ildən fəaliyyət göstərən AzMİU İBİ tələbə və tədqiqatçıların innovativ ideyalarını qlobal bazara çıxarıla bilən kommersiya məhsullarına çevirməyə xidmət edir.
+              </p>
+              <p data-i18n="aboutP2" class="text-sm sm:text-base text-slate-500 leading-relaxed">
+                Biz müasir laboratoriya infrastrukturu, yüksək ixtisaslı sənaye mentorları və vençur fondları ilə birgə işləyərək PropTech, GreenTech, Smart City və BIM sahələrində startaplar yetişdiririk.
+              </p>
+            </div>
+
+            <div class="lg:col-span-6 space-y-4 animate-on-scroll">
+              
+              <div class="glass-panel glass-panel-hover rounded-2xl p-6 border border-slate-200 shadow-xl flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 text-blue-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="layers" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h3 data-i18n="aboutBullet1Title" class="text-lg font-bold text-slate-950 mb-1">
+                    Dərin İnkubasiya və Akselerasiya
+                  </h3>
+                  <p data-i18n="aboutBullet1Desc" class="text-sm text-slate-600 leading-relaxed">
+                    12 həftəlik intensiv metodologiya, MVP hazırlığı və biznes modelinin formalaşdırılması.
+                  </p>
+                </div>
+              </div>
+
+              <div class="glass-panel glass-panel-hover rounded-2xl p-6 border border-slate-200 shadow-xl flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-blue-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="box" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h3 data-i18n="aboutBullet2Title" class="text-lg font-bold text-slate-950 mb-1">
+                    FabLab və 3D Prototipləmə
+                  </h3>
+                  <p data-i18n="aboutBullet2Desc" class="text-sm text-slate-600 leading-relaxed">
+                    3D printerlər, CNC dəzgahları və VR/AR laboratoriyaları ilə real prototiplərin qurulması.
+                  </p>
+                </div>
+              </div>
+
+              <div class="glass-panel glass-panel-hover rounded-2xl p-6 border border-slate-200 shadow-xl flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="globe" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h3 data-i18n="aboutBullet3Title" class="text-lg font-bold text-slate-950 mb-1">
+                    Qlobal Əlaqələr və Toxum İnvestisiya
+                  </h3>
+                  <p data-i18n="aboutBullet3Desc" class="text-sm text-slate-600 leading-relaxed">
+                    Yerli və beynəlxalq vençur fondları, biznes mələkləri və korporativ qrantlara çıxış.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Animated Stats Bar (High Contrast Readability & JS CountUp) -->
+          <div id="stats-section" class="glass-panel rounded-2xl p-8 sm:p-10 border border-slate-200 shadow-2xl animate-on-scroll">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-slate-700/50">
+              
+              <!-- Stat 1: 100+ Startap -->
+              <div class="pt-4 md:pt-0">
+                <div class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-heading mb-2">
+                  <span class="stat-counter" data-target="100" data-suffix="+">0</span>
+                </div>
+                <div data-i18n="statStartups" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-600">
+                  Startap
+                </div>
+              </div>
+
+              <!-- Stat 2: 50+ Mentor -->
+              <div class="pt-4 md:pt-0">
+                <div class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400 font-heading mb-2">
+                  <span class="stat-counter" data-target="50" data-suffix="+">0</span>
+                </div>
+                <div data-i18n="statMentors" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-600">
+                  Mentor
+                </div>
+              </div>
+
+              <!-- Stat 3: 500+ Tələbə -->
+              <div class="pt-4 md:pt-0">
+                <div class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 font-heading mb-2">
+                  <span class="stat-counter" data-target="500" data-suffix="+">0</span>
+                </div>
+                <div data-i18n="statStudents" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-600">
+                  Tələbə
+                </div>
+              </div>
+
+              <!-- Stat 4: 20+ Tərəfdaş -->
+              <div class="pt-4 md:pt-0">
+                <div class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-rose-400 font-heading mb-2">
+                  <span class="stat-counter" data-target="20" data-suffix="+">0</span>
+                </div>
+                <div data-i18n="statPartners" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-600">
+                  Tərəfdaş
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 4. PROGRAMS (FUNCTIONAL FILTER TABS)       -->
+      <!-- ========================================== -->
+      <section id="programs" class="py-24 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-on-scroll">
+            <div class="max-w-2xl">
+              <span data-i18n="programsBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-blue-700 border border-violet-500/20 mb-3">
+                Aktiv Proqramlar
+              </span>
+              <h2 data-i18n="programsTitle" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight mb-2">
+                İnkubasiya və Təhsil Təşəbbüsləri
+              </h2>
+              <p data-i18n="programsSubtitle" class="text-sm sm:text-base text-slate-600">
+                İdeya mərhələsindən qlobal investisiyalara qədər hər səviyyə üçün ixtisaslaşmış akselerasiya proqramları.
+              </p>
+            </div>
+
+            <!-- Functional JS Filter Tabs -->
+            <div class="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-white border border-slate-200">
+              <button 
+                type="button"
+                data-filter="all" 
+                onclick="renderPrograms('all')"
+                class="prog-filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-950 bg-gradient-to-r from-violet-600 to-cyan-500 shadow-md shadow-cyan-500/20 cursor-pointer"
+              >
+                <span data-i18n="filterAll">Hamısı</span>
+              </button>
+              <button 
+                type="button"
+                data-filter="education" 
+                onclick="renderPrograms('education')"
+                class="prog-filter-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-200 cursor-pointer transition-all"
+              >
+                <span data-i18n="filterEducation">Təhsil</span>
+              </button>
+              <button 
+                type="button"
+                data-filter="incubation" 
+                onclick="renderPrograms('incubation')"
+                class="prog-filter-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-200 cursor-pointer transition-all"
+              >
+                <span data-i18n="filterIncubation">İnkubasiya</span>
+              </button>
+              <button 
+                type="button"
+                data-filter="events" 
+                onclick="renderPrograms('events')"
+                class="prog-filter-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-200 cursor-pointer transition-all"
+              >
+                <span data-i18n="filterEvents">Tədbirlər</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Programs Cards Grid -->
+          <div id="programs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 animate-on-scroll">
+            <!-- Populated dynamically by script.js -->
+          </div>
+
+          <div class="mt-20 border-t border-slate-200 pt-12">
+            <div class="max-w-2xl mb-8">
+              <span data-i18n="pastProgramsBadge" class="inline-block mb-3 text-xs font-semibold uppercase tracking-wider text-blue-700">Arxiv</span>
+              <h3 data-i18n="pastProgramsTitle" class="text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight mb-2">Keçmiş proqramlar</h3>
+              <p data-i18n="pastProgramsSubtitle" class="text-sm sm:text-base text-slate-600">Aşağıdakı nümunələr şablon məlumatdır.</p>
+            </div>
+            <div id="past-programs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 5. STARTUP JOURNEY (ROADMAP CUSTOM DESIGN) -->
+      <!-- ========================================== -->
+      <section id="timeline" class="py-24 border-t border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="text-center max-w-2xl mx-auto mb-20 animate-on-scroll">
+            <span data-i18n="timelineBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-blue-700 border border-cyan-500/20 mb-3">
+              Addım-addım
+            </span>
+            <h2 data-i18n="timelineTitle" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight mb-3">
+              Startapın İnkubasiya Səyahəti
+            </h2>
+            <p data-i18n="timelineSubtitle" class="text-sm sm:text-base text-slate-600">
+              Universitet auditoriyasından beynəlxalq bazara aparan 7 mərhələli ardıcıl inkişaf sistemi.
+            </p>
+          </div>
+
+          <!-- Vertical Timeline with Center Connecting Line -->
+          <div class="relative">
+            <!-- Continuous Vertical Neon Connecting Line leading to Step 7 -->
+            <div id="timeline-connector" class="timeline-connector absolute left-6 md:left-1/2 top-4 w-0.5 -ml-px"></div>
+
+            <div class="space-y-12 sm:space-y-16">
+              
+              <!-- Step 1: Left Card, Center Node -->
+              <div class="timeline-step relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
+                <div class="md:w-1/2 md:text-right order-2 md:order-1">
+                  <div class="timeline-card glass-panel rounded-2xl p-6 border border-slate-200 shadow-xl" data-dot-id="dot-step-1">
+                    <span data-i18n="step1Phase" class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1 block">Mərhələ 01</span>
+                    <h3 data-i18n="step1Title" class="text-lg font-bold text-slate-950 mb-2">1. İdeya və Qeydiyyat</h3>
+                    <p data-i18n="step1Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Tələbə və tədqiqatçılar öz innovativ biznes ideyalarını portalımız vasitəsilə təqdim edirlər.
+                    </p>
+                  </div>
+                </div>
+                <!-- Translucent glass center, glowing neon cyan border, visible step number -->
+                <div id="dot-step-1" class="timeline-dot w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-blue-700 text-lg z-10 shrink-0 order-1 md:order-2 ml-0.5 md:ml-0">
+                  1
+                </div>
+                <div class="hidden md:block md:w-1/2 order-3"></div>
+              </div>
+
+              <!-- Step 2: Center Node, Right Card -->
+              <div class="timeline-step relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
+                <div class="hidden md:block md:w-1/2 order-1"></div>
+                <div id="dot-step-2" class="timeline-dot timeline-dot-violet w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-blue-700 text-lg z-10 shrink-0 order-1 md:order-2 ml-0.5 md:ml-0">
+                  2
+                </div>
+                <div class="md:w-1/2 order-2 md:order-3">
+                  <div class="timeline-card glass-panel rounded-2xl p-6 border border-slate-200 shadow-xl" data-dot-id="dot-step-2">
+                    <span data-i18n="step2Phase" class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1 block">Mərhələ 02</span>
+                    <h3 data-i18n="step2Title" class="text-lg font-bold text-slate-950 mb-2">2. İlkin Qiymətləndirmə və Seçim</h3>
+                    <p data-i18n="step2Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Ekspert komitəsi bazar potensialı, texniki həyata keçirilmə və komanda motivasiyasını dəyərləndirir.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 3: Left Card, Center Node -->
+              <div class="timeline-step relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
+                <div class="md:w-1/2 md:text-right order-2 md:order-1">
+                  <div class="timeline-card glass-panel rounded-2xl p-6 border border-slate-200 shadow-xl" data-dot-id="dot-step-3">
+                    <span data-i18n="step3Phase" class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1 block">Mərhələ 03</span>
+                    <h3 data-i18n="step3Title" class="text-lg font-bold text-slate-950 mb-2">3. Komanda Formalaşması və MVP</h3>
+                    <p data-i18n="step3Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Biznes, dizayn və mühəndislik ixtisaslarından olan tələbələr vahid komanda təşkil edərək ilkin məhsulu (MVP) qururlar.
+                    </p>
+                  </div>
+                </div>
+                <div id="dot-step-3" class="timeline-dot w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-blue-700 text-lg z-10 shrink-0 order-1 md:order-2 ml-0.5 md:ml-0">
+                  3
+                </div>
+                <div class="hidden md:block md:w-1/2 order-3"></div>
+              </div>
+
+              <!-- Step 4: Center Node, Right Card -->
+              <div class="timeline-step relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
+                <div class="hidden md:block md:w-1/2 order-1"></div>
+                <div id="dot-step-4" class="timeline-dot timeline-dot-violet w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-blue-700 text-lg z-10 shrink-0 order-1 md:order-2 ml-0.5 md:ml-0">
+                  4
+                </div>
+                <div class="md:w-1/2 order-2 md:order-3">
+                  <div class="timeline-card glass-panel rounded-2xl p-6 border border-slate-200 shadow-xl" data-dot-id="dot-step-4">
+                    <span data-i18n="step4Phase" class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1 block">Mərhələ 04</span>
+                    <h3 data-i18n="step4Title" class="text-lg font-bold text-slate-950 mb-2">4. İntensiv Mentorluq və Təlimlər</h3>
+                    <p data-i18n="step4Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Həftəlik 1-on-1 mentor sessiyaları, biznes modeli kətanı, maliyyə planlaması və hüquqi dəstək.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 5: Left Card, Center Node -->
+              <div class="timeline-step relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
+                <div class="md:w-1/2 md:text-right order-2 md:order-1">
+                  <div class="timeline-card glass-panel rounded-2xl p-6 border border-slate-200 shadow-xl" data-dot-id="dot-step-5">
+                    <span data-i18n="step5Phase" class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1 block">Mərhələ 05</span>
+                    <h3 data-i18n="step5Title" class="text-lg font-bold text-slate-950 mb-2">5. Pilot Sınaqlar və Laboratoriya Validasiyası</h3>
+                    <p data-i18n="step5Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      AzMİU FabLab və sənaye partnyorlarının obyektlərində real mühitdə məhsulun sınaqdan keçirilməsi.
+                    </p>
+                  </div>
+                </div>
+                <div id="dot-step-5" class="timeline-dot w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-blue-700 text-lg z-10 shrink-0 order-1 md:order-2 ml-0.5 md:ml-0">
+                  5
+                </div>
+                <div class="hidden md:block md:w-1/2 order-3"></div>
+              </div>
+
+              <!-- Step 6: Center Node, Right Card -->
+              <div class="timeline-step relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
+                <div class="hidden md:block md:w-1/2 order-1"></div>
+                <div id="dot-step-6" class="timeline-dot timeline-dot-violet w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-blue-700 text-lg z-10 shrink-0 order-1 md:order-2 ml-0.5 md:ml-0">
+                  6
+                </div>
+                <div class="md:w-1/2 order-2 md:order-3">
+                  <div class="timeline-card glass-panel rounded-2xl p-6 border border-slate-200 shadow-xl" data-dot-id="dot-step-6">
+                    <span data-i18n="step6Phase" class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1 block">Mərhələ 06</span>
+                    <h3 data-i18n="step6Title" class="text-lg font-bold text-slate-950 mb-2">6. Demo Day və Təqdimat</h3>
+                    <p data-i18n="step6Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Vençur investorlar, korporativ tərəfdaşlar və media qarşısında yekun layihə təqdimatı və pitçinq.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ============================================================== -->
+              <!-- STEP 7: CLEAN, ELEGANT CENTERED FINAL MILESTONE -->
+              <!-- ============================================================== -->
+              <div class="timeline-step-final relative pt-6 flex flex-col items-center justify-center text-center">
+                
+                <!-- Centered Step 7 Node Dot (matching steps 1-6) -->
+                <div id="dot-step-7" class="timeline-dot timeline-dot-emerald w-12 h-12 rounded-full flex items-center justify-center font-bold text-emerald-700 text-lg z-20 shrink-0 mb-4">
+                  7
+                </div>
+
+                <!-- Step 7 Clean Centered Card -->
+                <div class="timeline-card max-w-2xl w-full glass-panel rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xl" data-dot-id="dot-step-7">
+                  
+                  <span data-i18n="step7Phase" class="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1 block">Mərhələ 07</span>
+                  <h3 data-i18n="step7Title" class="text-xl sm:text-2xl font-bold text-slate-950 mb-2">
+                    7. Məzuniyyət və Şirkətləşmə
+                  </h3>
+
+                  <p data-i18n="step7Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-xl mx-auto mb-6">
+                    İnkubasiya proqramını uğurla bitirən layihələrin hüquqi qeydiyyatı, şirkətləşməsi və universitet dəstəyi ilə sənaye tərəfdaşlıqlarının qurulması.
+                  </p>
+
+                  <!-- Realistic Key Incubator Benefits Grid -->
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-left">
+                    <div class="p-3.5 rounded-xl bg-white border border-slate-200 flex items-center gap-3">
+                      <i data-lucide="layers" class="w-5 h-5 text-blue-700 shrink-0"></i>
+                      <div>
+                        <div class="text-xs font-semibold text-slate-700" data-i18n="step7Metric1Label">MVP Prototipləmə</div>
+                        <div class="text-[11px] text-slate-500" data-i18n="step7Metric1Value">Dəstək və FabLab</div>
+                      </div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-white border border-slate-200 flex items-center gap-3">
+                      <i data-lucide="users" class="w-5 h-5 text-emerald-700 shrink-0"></i>
+                      <div>
+                        <div class="text-xs font-semibold text-slate-700" data-i18n="step7Metric2Label">Mentorluq & Məsləhət</div>
+                        <div class="text-[11px] text-slate-500" data-i18n="step7Metric2Value">Sənaye ekspertləri</div>
+                      </div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-white border border-slate-200 flex items-center gap-3">
+                      <i data-lucide="network" class="w-5 h-5 text-blue-700 shrink-0"></i>
+                      <div>
+                        <div class="text-xs font-semibold text-slate-700" data-i18n="step7Metric3Label">Qrant & Şəbəkə</div>
+                        <div class="text-[11px] text-slate-500" data-i18n="step7Metric3Value">İnvestor ekosistemi</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Direct Action CTA inside Final Milestone Card -->
+                  <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button 
+                      onclick="openModal('idea')"
+                      class="btn-primary px-6 py-2.5 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <span data-i18n="step7BtnApply">İnkubasiyaya Müraciət</span>
+                      <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                    </button>
+                    <a 
+                      href="#startups"
+                      class="btn-secondary px-5 py-2.5 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <span data-i18n="step7BtnStartups">Məzun Startapları Gör</span>
+                    </a>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 6. FEATURED STARTUPS (PROFILE MODAL)       -->
+      <!-- ========================================== -->
+      <section id="startups" class="py-24 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="max-w-3xl mb-16 animate-on-scroll">
+            <span data-i18n="startupsBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 mb-3">
+              İnkubasiya Məzunları
+            </span>
+            <h2 data-i18n="startupsTitle" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight mb-2">
+              Seçilmiş Startaplarımız
+            </h2>
+            <p data-i18n="startupsSubtitle" class="text-sm sm:text-base text-slate-600">
+              İnkubatorumuzun divarları arasında doğulub real bazarda gəlir qazanan innovativ komandalar.
+            </p>
+          </div>
+
+          <!-- Startups Grid Rendered via JS -->
+          <div id="startups-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-on-scroll">
+            <!-- Rendered by script.js -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 7. UPCOMING EVENTS                         -->
+      <!-- ========================================== -->
+      <section id="events" class="py-24 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 animate-on-scroll">
+            <div class="max-w-2xl">
+              <span data-i18n="eventsBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 border border-amber-500/20 mb-3">
+                Təqvim
+              </span>
+              <h2 data-i18n="eventsTitle" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight mb-2">
+                Qarşıdan Gələn Tədbirlər
+              </h2>
+              <p data-i18n="eventsSubtitle" class="text-sm sm:text-base text-slate-600">
+                Vorkşoplar, hakatonlar və investor görüşləri ilə innovasiya cəmiyyətimizə qoşulun.
+              </p>
+            </div>
+          </div>
+
+          <!-- Events Grid Rendered via JS -->
+          <div id="events-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-on-scroll">
+            <!-- Rendered by script.js -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 8. NEWS & UPDATES (WITH DARK GRADIENT MASK) -->
+      <!-- ========================================== -->
+      <section id="news" class="py-24 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="max-w-3xl mb-16 animate-on-scroll">
+            <span data-i18n="newsBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 border border-blue-500/20 mb-3">
+              Bloq və Elanlar
+            </span>
+            <h2 data-i18n="newsTitle" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight mb-2">
+              Xəbərlər və Yeniliklər
+            </h2>
+            <p data-i18n="newsSubtitle" class="text-sm sm:text-base text-slate-600">
+              İnkubatorumuzun qrant uğurları, beynəlxalq əməkdaşlıqları və startap nailiyyətləri.
+            </p>
+          </div>
+
+          <!-- News Cards Grid Rendered via JS with Gradient Overlay Masks -->
+          <div id="news-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-on-scroll">
+            <!-- Rendered by script.js -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 9. MENTORS NETWORK & BECOME A MENTOR CTA   -->
+      <!-- ========================================== -->
+      <section id="mentors" class="py-24 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-on-scroll">
+            <div class="max-w-2xl">
+              <span data-i18n="mentorsBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-blue-700 border border-cyan-500/20 mb-3">
+                Ekspertlər Şəbəkəsi
+              </span>
+              <h2 data-i18n="mentorsTitle" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight mb-2">
+                Bizim Mentorlarımız
+              </h2>
+              <p data-i18n="mentorsSubtitle" class="text-sm sm:text-base text-slate-600">
+                Sənayenin aparıcı rəhbərləri, təcrübəli sahibkarlar və texnologiya arxitektorları.
+              </p>
+              <button 
+                onclick="openModal('mentor')"
+                class="btn-primary mt-5 px-5 py-2.5 text-sm whitespace-nowrap"
+              >
+                <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
+                <span data-i18n="btnBecomeMentor">Mentor kimi qoşul</span>
+              </button>
+            </div>
+
+            <!-- Mentor Filter Tabs -->
+            <div class="flex items-center">
+              <div class="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-white border border-slate-200">
+                <button 
+                  type="button"
+                  data-filter="all" 
+                  onclick="renderMentors('all')"
+                  class="mentor-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-900 border border-slate-900 cursor-pointer"
+                >
+                  <span data-i18n="filterAll">Hamısı</span>
+                </button>
+                <button 
+                  type="button"
+                  data-filter="it" 
+                  onclick="renderMentors('it')"
+                  class="mentor-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-200 cursor-pointer transition-all"
+                >
+                  <span data-i18n="filterIT">IT və Mühəndislik</span>
+                </button>
+                <button 
+                  type="button"
+                  data-filter="marketing" 
+                  onclick="renderMentors('marketing')"
+                  class="mentor-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-200 cursor-pointer transition-all"
+                >
+                  <span data-i18n="filterMarketing">Marketinq</span>
+                </button>
+                <button 
+                  type="button"
+                  data-filter="design" 
+                  onclick="renderMentors('design')"
+                  class="mentor-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-200 cursor-pointer transition-all"
+                >
+                  <span data-i18n="filterDesign">Dizayn və BIM</span>
+                </button>
+                <button 
+                  type="button"
+                  data-filter="business" 
+                  onclick="renderMentors('business')"
+                  class="mentor-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-200 cursor-pointer transition-all"
+                >
+                  <span data-i18n="filterBusiness">Biznes</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Mentors Cards Grid Rendered via JS -->
+          <div id="mentors-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-on-scroll">
+            <!-- Rendered by script.js -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 10. PARTNERS INFINITE MARQUEE              -->
+      <!-- ========================================== -->
+      <section id="partners" class="py-20 border-t border-slate-200 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center">
+          <span data-i18n="partnersBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-blue-700 border border-violet-500/20 mb-3">
+            Eko-Sistem
+          </span>
+          <h2 data-i18n="partnersTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
+            Tərəfdaş və Əməkdaşlarımız
+          </h2>
+          <p data-i18n="partnersSubtitle" class="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl mx-auto">
+            İnnovasiyaları birgə dəstəklədiyimiz aparıcı dövlət, təhsil və investisiya institutları.
+          </p>
+        </div>
+
+        <!-- Marquee Infinite Animation Container -->
+        <div class="marquee-container w-full overflow-hidden relative">
+          <div class="marquee-track flex items-center gap-6 py-4">
+            
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="landmark" class="w-5 h-5 text-blue-700"></i>
+              <span>Elm və Təhsil Nazirliyi</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="cpu" class="w-5 h-5 text-blue-700"></i>
+              <span>İRİA (IDDA)</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="rocket" class="w-5 h-5 text-amber-700"></i>
+              <span>SUP VC</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="building-2" class="w-5 h-5 text-blue-700"></i>
+              <span>PAŞA Holdinq</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="zap" class="w-5 h-5 text-rose-400"></i>
+              <span>Technovate</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="globe" class="w-5 h-5 text-indigo-400"></i>
+              <span>Erasmus+ CBHE</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="briefcase" class="w-5 h-5 text-emerald-700"></i>
+              <span>KOBİA</span>
+            </div>
+
+            <!-- Duplicate Set for Seamless Loop -->
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="landmark" class="w-5 h-5 text-blue-700"></i>
+              <span>Elm və Təhsil Nazirliyi</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="cpu" class="w-5 h-5 text-blue-700"></i>
+              <span>İRİA (IDDA)</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="rocket" class="w-5 h-5 text-amber-700"></i>
+              <span>SUP VC</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="building-2" class="w-5 h-5 text-blue-700"></i>
+              <span>PAŞA Holdinq</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="zap" class="w-5 h-5 text-rose-400"></i>
+              <span>Technovate</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="globe" class="w-5 h-5 text-indigo-400"></i>
+              <span>Erasmus+ CBHE</span>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0">
+              <i data-lucide="briefcase" class="w-5 h-5 text-emerald-700"></i>
+              <span>KOBİA</span>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- 11. FOOTER                                 -->
+    <!-- ========================================== -->
+    <footer id="site-footer" class="border-t border-slate-800 pt-16 pb-12 text-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-slate-200">
+          
+          <!-- Column 1: Info -->
+          <div class="md:col-span-5 space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-cyan-400 p-[1.5px]">
+                <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
+                  <i data-lucide="layers" class="w-5 h-5 text-blue-700"></i>
+                </div>
+              </div>
+              <span class="text-xl font-bold text-white font-heading">
+                AzMİU <span class="text-sky-400">İBİ</span>
+              </span>
+            </div>
+            <p data-i18n="footerDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-sm">
+              Azərbaycan Memarlıq və İnşaat Universiteti İnnovativ Biznes İnkubatoru — universitet intellektual potensialını rəqabətədavamlı bizneslərə çevirən innovasiya mərkəzidir.
+            </p>
+            <div class="flex flex-wrap items-center gap-2.5 pt-2">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.37 3.5A2.37 2.37 0 1 1 5.36 8.24 2.37 2.37 0 0 1 5.37 3.5ZM3.32 9.82h4.1V22h-4.1V9.82Zm6.63 0h3.93v1.66h.06c.55-1.04 1.88-2.14 3.87-2.14 4.14 0 4.9 2.73 4.9 6.27V22h-4.09v-5.66c0-1.35-.03-3.09-1.88-3.09-1.88 0-2.17 1.47-2.17 2.99V22H9.95V9.82Z"/></svg>
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.6 2h8.8A5.6 5.6 0 0 1 22 7.6v8.8a5.6 5.6 0 0 1-5.6 5.6H7.6A5.6 5.6 0 0 1 2 16.4V7.6A5.6 5.6 0 0 1 7.6 2Zm-.2 2A3.4 3.4 0 0 0 4 7.4v9.2A3.4 3.4 0 0 0 7.4 20h9.2a3.4 3.4 0 0 0 3.4-3.4V7.4A3.4 3.4 0 0 0 16.6 4H7.4Zm9.85 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
+              </a>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="Facebook">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.8 22v-8.2h2.75l.41-3.2H13.8V8.56c0-.93.26-1.56 1.59-1.56h1.7V4.14A22.7 22.7 0 0 0 14.61 4c-2.45 0-4.13 1.5-4.13 4.25v2.37H7.7v3.2h2.78V22h3.32Z"/></svg>
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="YouTube">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.57 12 3.57 12 3.57s-7.55 0-9.4.51A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.51 9.4.51 9.4.51s7.55 0 9.4-.51a3 3 0 0 0 2.1-2.12A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.62V8.38L15.87 12 9.6 15.62Z"/></svg>
+              </a>
+              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="TikTok">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 2c.2 1.74 1.17 3.3 2.64 4.25A7.2 7.2 0 0 0 23 7.38v3.35a10.4 10.4 0 0 1-6.35-2.05v7.02a6.3 6.3 0 1 1-5.43-6.24v3.4a2.98 2.98 0 1 0 2.1 2.84V2h3.28Z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Column 2: Quick Links (Fully Translated) -->
+          <div class="md:col-span-3 space-y-3">
+            <h4 data-i18n="footerQuickLinks" class="text-xs font-bold uppercase tracking-wider text-white">
+              Sürətli Keçidlər
+            </h4>
+            <ul class="space-y-2.5 text-xs sm:text-sm">
+              <li><a href="#about" data-i18n="footerLinkAbout" class="hover:text-blue-700 transition-colors">Haqqımızda</a></li>
+              <li><a href="#programs" data-i18n="footerLinkPrograms" class="hover:text-blue-700 transition-colors">Aktiv Proqramlar</a></li>
+              <li><a href="#timeline" data-i18n="footerLinkTimeline" class="hover:text-blue-700 transition-colors">İnkubasiya Yol Xəritəsi</a></li>
+              <li><a href="#startups" data-i18n="footerLinkStartups" class="hover:text-blue-700 transition-colors">Uğurlu Startaplar</a></li>
+              <li><a href="#events" data-i18n="footerLinkEvents" class="hover:text-blue-700 transition-colors">Qarşıdan Gələn Tədbirlər</a></li>
+              <li><a href="#news" data-i18n="footerLinkNews" class="hover:text-blue-700 transition-colors">Xəbərlər və Yeniliklər</a></li>
+              <li><a href="#mentors" data-i18n="footerLinkMentors" class="hover:text-blue-700 transition-colors">Mentor Şəbəkəsi</a></li>
+            </ul>
+          </div>
+
+          <!-- Column 3: Contact & Address -->
+          <div class="md:col-span-4 space-y-3">
+            <h4 data-i18n="footerContact" class="text-xs font-bold uppercase tracking-wider text-white">
+              Əlaqə
+            </h4>
+            <ul class="space-y-2.5 text-xs sm:text-sm">
+              <li class="flex items-start gap-2.5">
+                <i data-lucide="map-pin" class="w-4 h-4 text-blue-700 shrink-0 mt-0.5"></i>
+                <span data-i18n="footerAddress">Ayna Sultanova küç. 11, Bakı, Azərbaycan, AZ1073</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="mail" class="w-4 h-4 text-blue-700 shrink-0"></i>
+                <a href="mailto:incubator@ibi-portal.az" class="hover:text-blue-700 transition-colors">incubator@ibi-portal.az</a>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="phone" class="w-4 h-4 text-blue-700 shrink-0"></i>
+                <span>+994 (12) 539-05-84</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Bottom Row (Clean Mobile Stack) -->
+        <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+          <p data-i18n="footerRights">© 2026 AzMİU İnnovativ Biznes İnkubatoru. Bütün hüquqlar qorunur.</p>
+          <div class="flex items-center gap-6">
+            <a href="#hero" class="hover:text-blue-700 transition-colors flex items-center gap-1.5 font-semibold">
+              <span data-i18n="footerBackToTop">Yuxarı Qayıdın</span>
+              <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- FLOATING "BACK TO TOP" BUTTON (BOTTOM RIGHT)-->
+    <!-- ========================================== -->
+    <button 
+      id="back-to-top-btn"
+      type="button"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+      class="fixed bottom-6 right-6 z-40 p-3.5 rounded-2xl backdrop-blur-xl bg-white hover:bg-slate-100 border-2 border-cyan-400/60 hover:border-cyan-300 text-blue-700 hover:text-slate-950 shadow-xl shadow-cyan-500/20 group cursor-pointer focus:outline-none"
+      title="Yuxarı Qayıdın / Back to Top"
+      aria-label="Back to Top"
+    >
+      <i data-lucide="arrow-up" class="w-5 h-5 group-hover:-translate-y-1 transition-transform"></i>
+    </button>
+
+    <!-- ========================================== -->
+    <!-- 12. DYNAMIC MODAL CONTROLLER (4 DISTINCT FORMS) -->
+    <!-- ========================================== -->
+    <div 
+      id="universal-modal" 
+      class="fixed inset-0 z-[150] flex items-center justify-center p-4 backdrop-blur-xl bg-slate-950/80 hidden opacity-0 transition-opacity duration-300"
+      onclick="if(event.target === this) closeModal()"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="modal-scroll-area max-w-xl w-full max-h-[92vh] overflow-y-auto backdrop-blur-2xl bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl relative text-slate-900">
+        
+        <!-- Modal Close Button -->
+        <button 
+          type="button"
+          onclick="closeModal()" 
+          class="absolute top-5 right-5 text-slate-500 hover:text-slate-950 p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+          aria-label="Close dialog"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Modal Dynamic Header -->
+        <div id="modal-header" class="mb-6 pr-10 flex items-start gap-3.5">
+          <div id="modal-header-icon" class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 id="modal-title" class="text-xl sm:text-2xl font-bold text-slate-950 mb-1 leading-snug">
+              Müraciət Formu
+            </h2>
+            <p id="modal-desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Zəhmət olmasa tələb olunan məlumatları doldurun.
+            </p>
+          </div>
+        </div>
+
+        <!-- Dynamic Form Container (Populated via JS for Form 1, 2, 3 or 4) -->
+        <div id="dynamic-form-container">
+          <!-- Populated by script.js openModal() -->
+        </div>
+
+        <!-- Form Success State Screen -->
+        <div id="modal-success" class="hidden text-center py-8 space-y-4">
+          <div class="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-700 flex items-center justify-center mx-auto mb-2 shadow-lg shadow-emerald-500/10">
+            <i data-lucide="check" class="w-8 h-8"></i>
+          </div>
+          <h3 id="modal-success-title" class="text-xl sm:text-2xl font-bold text-slate-950">
+            Müraciətiniz Uğurla Qəbul Olundu!
+          </h3>
+          <p id="modal-success-desc" class="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+            Təşəkkür edirik! Məlumatlarınız qeydə alındı. İnkubator komandamız 48 saat ərzində sizinlə əlaqə saxlayacaq.
+          </p>
+          <div class="pt-4">
+            <button 
+              type="button" 
+              onclick="closeModal()" 
+              class="btn-primary px-7 py-2.5 text-sm"
+            >
+              <span data-i18n="btnSuccessClose">Tamamdır</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PROGRAM & EVENT INFORMATION MODAL -->
+    <div
+      id="details-modal"
+      class="fixed inset-0 z-[180] flex items-center justify-center p-4 backdrop-blur-xl bg-slate-950/80 hidden opacity-0 transition-opacity duration-300"
+      onclick="if(event.target === this) closeDetailsModal()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="details-modal-title"
+    >
+      <div id="details-modal-content" class="modal-scroll-area max-w-2xl w-full max-h-[92vh] overflow-y-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl relative text-slate-900">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- STARTUP DETAILS GLASS MODAL                -->
+    <!-- ========================================== -->
+    <div 
+      id="startup-modal" 
+      class="fixed inset-0 z-[150] flex items-center justify-center p-4 backdrop-blur-xl bg-slate-950/80 hidden opacity-0 transition-opacity duration-300"
+      onclick="if(event.target === this) closeStartupModal()"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div id="startup-modal-content" class="modal-scroll-area max-w-2xl w-full max-h-[92vh] overflow-y-auto backdrop-blur-2xl bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl relative text-slate-900">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- NEWS FULLSCREEN GLASS LIGHTBOX             -->
+    <!-- ========================================== -->
+    <div 
+      id="news-lightbox" 
+      class="fixed inset-0 z-[200] flex items-center justify-center p-4 backdrop-blur-3xl bg-slate-950/85 hidden opacity-0 transition-opacity duration-300"
+      onclick="if(event.target === this) closeNewsLightbox()"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div id="news-lightbox-content" class="modal-scroll-area max-w-3xl w-full max-h-[94vh] overflow-y-auto backdrop-blur-2xl bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl relative">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+    </div>
+
+    <!-- Core Application Logic -->
+    <script type="module" src="/script.js"></script>
+  </body>
+</html>
+
+
+
