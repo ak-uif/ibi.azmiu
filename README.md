@@ -1,6 +1,6 @@
 # İBİ AzMİU
 
-AzMİU İBİ layihəsinin public saytı, demo admin paneli və Spring Boot backend təməli bu repozitoriyadadır. Backend-də PostgreSQL sxemi və Flyway migration-ı var. Müraciət formaları və admin girişi hələ nümayiş rejimindədir: real authentication və API bağlantısı yoxdur, frontend-dən göndərilən məlumat saxlanmır.
+AzMİU İBİ layihəsinin public saytı, admin paneli və Spring Boot backend-i bu repozitoriyadadır. Backend-də PostgreSQL sxemi, Flyway migration-ları və session əsaslı admin authentication var. Public müraciət formaları hələ API-yə qoşulmayıb; frontend-dən göndərilən məlumat saxlanmır.
 
 ## Frontend-i yerli işə salmaq
 
@@ -13,13 +13,13 @@ npm run dev
 
 Terminalda görünən yerli ünvanı brauzerdə açın.
 
-Admin giriş səhifəsi `/admin`, demo dashboard isə girişdən sonra `/admin/dashboard` ünvanındadır. Demo girişdə istənilən boş olmayan istifadəçi adı və şifrə qəbul edilir; bu, real qoruma deyil.
+Admin giriş səhifəsi `/admin`, qorunan dashboard isə uğurlu girişdən sonra `/admin/dashboard` ünvanındadır. Lokal frontend `VITE_API_BASE_URL=http://localhost:8080` vasitəsilə backend-ə qoşulur; dashboard göstəriciləri hələ nümunədir.
 
 ## Backend-i yerli işə salmaq (Windows)
 
 Java 21 tələb olunur. Global Maven quraşdırmaq lazım deyil; layihənin Maven Wrapper-i istifadə edilir:
 
-Əvvəl PostgreSQL-də local database və `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` environment variable-larını hazırlayın. Təlimat: [local setup](docs/setup.md).
+Əvvəl PostgreSQL-də local database və `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `ADMIN_USERNAME`, `ADMIN_PASSWORD` environment variable-larını hazırlayın. Təlimat: [local setup](docs/setup.md).
 
 ```powershell
 cd backend
@@ -50,4 +50,4 @@ Live Server istifadə etmək istəyirsinizsə, əvvəl `npm run build` işlədin
 - `backend/` — Java 21 və Spring Boot 4.1.1 backend təməli
 - `vercel.json` — admin URL-ləri üçün rewrite qaydaları
 
-Gələcək mərhələlərdə müraciət formaları real API-yə bağlanmalı, admin girişi isə server tərəfində qorunmalıdır. Bu repozitoriyaya real şifrə və `.env` faylı əlavə etməyin.
+Gələcək mərhələlərdə müraciət formaları real API-yə bağlanmalıdır. Lokal `localhost:8080` backend-i Vercel-dəki frontend üçün əlçatan deyil; canlı admin girişi üçün ayrıca backend yayımı tələb olunur. Bu repozitoriyaya real şifrə və `.env` faylı əlavə etməyin.
