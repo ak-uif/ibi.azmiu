@@ -1,0 +1,13 @@
+{
+  "name": "ibi-local-prisma-studio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local read-only database viewer; Flyway remains the migration source",
+  "scripts": {
+    "db:pull": "prisma db pull --schema=prisma/schema.prisma",
+    "studio": "prisma studio --schema=prisma/schema.prisma --port=5555 --hostname=127.0.0.1 --browser=none"
+  },
+  "devDependencies": {
+    "prisma": "6.19.1"
+  }
+}
