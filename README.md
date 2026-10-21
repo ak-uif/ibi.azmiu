@@ -1,6 +1,6 @@
 # İBİ AzMİU
 
-AzMİU İBİ layihəsinin public saytı, demo admin paneli və Spring Boot backend təməli bu repozitoriyadadır. Müraciət formaları və admin girişi hələ nümayiş rejimindədir: real authentication və məlumat bazası bağlantısı yoxdur, göndərilən məlumat saxlanmır.
+AzMİU İBİ layihəsinin public saytı, demo admin paneli və Spring Boot backend təməli bu repozitoriyadadır. Backend-də PostgreSQL sxemi və Flyway migration-ı var. Müraciət formaları və admin girişi hələ nümayiş rejimindədir: real authentication və API bağlantısı yoxdur, frontend-dən göndərilən məlumat saxlanmır.
 
 ## Frontend-i yerli işə salmaq
 
@@ -18,6 +18,8 @@ Admin giriş səhifəsi `/admin`, demo dashboard isə girişdən sonra `/admin/d
 ## Backend-i yerli işə salmaq (Windows)
 
 Java 21 tələb olunur. Global Maven quraşdırmaq lazım deyil; layihənin Maven Wrapper-i istifadə edilir:
+
+Əvvəl PostgreSQL-də local database və `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` environment variable-larını hazırlayın. Təlimat: [local setup](docs/setup.md).
 
 ```powershell
 cd backend
