@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model event_registrations {
+  id          BigInt   @id @default(autoincrement())
+  full_name   String   @db.VarChar(255)
+  email       String   @db.VarChar(255)
+  phone       String   @db.VarChar(255)
+  event_title String   @db.VarChar(255)
+  format      String   @db.VarChar(255)
+  status      String   @default("NEW") @db.VarChar(255)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model events {
+  id             BigInt   @id @default(autoincrement())
+  day_label      String?  @db.VarChar(255)
+  month_az       String?  @db.VarChar(255)
+  month_en       String?  @db.VarChar(255)
+  title_az       String   @db.VarChar(255)
+  title_en       String?  @db.VarChar(255)
+  location_az    String?  @db.VarChar(255)
+  location_en    String?  @db.VarChar(255)
+  time_az        String?  @db.VarChar(255)
+  time_en        String?  @db.VarChar(255)
+  attendees      String?  @db.VarChar(255)
+  speaker_az     String?  @db.VarChar(255)
+  speaker_en     String?  @db.VarChar(255)
+  description_az String
+  description_en String?
+  details_az     String?
+  details_en     String?
+  published      Boolean  @default(false)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model flyway_schema_history {
+  installed_rank Int      @id(map: "flyway_schema_history_pk")
+  version        String?  @db.VarChar(50)
+  description    String   @db.VarChar(200)
+  type           String   @db.VarChar(20)
+  script         String   @db.VarChar(1000)
+  checksum       Int?
+  installed_by   String   @db.VarChar(100)
+  installed_on   DateTime @default(now()) @db.Timestamp(6)
+  execution_time Int
+  success        Boolean
+
+  @@index([success], map: "flyway_schema_history_s_idx")
+}
+
+model mentor_applications {
+  id           BigInt   @id @default(autoincrement())
+  full_name    String   @db.VarChar(255)
+  email        String   @db.VarChar(255)
+  phone        String   @db.VarChar(255)
+  company_role String   @db.VarChar(255)
+  expertise    String   @db.VarChar(255)
+  linkedin     String   @db.VarChar(2048)
+  bio          String
+  cv_url       String?  @db.VarChar(2048)
+  status       String   @default("NEW") @db.VarChar(255)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model mentors {
+  id           BigInt   @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  role_az      String?  @db.VarChar(255)
+  role_en      String?  @db.VarChar(255)
+  category     String?  @db.VarChar(255)
+  skills       Json?
+  avatar_url   String?  @db.VarChar(2048)
+  linkedin_url String?  @db.VarChar(2048)
+  github_url   String?  @db.VarChar(2048)
+  published    Boolean  @default(false)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model news {
+  id           BigInt   @id @default(autoincrement())
+  category_az  String?  @db.VarChar(255)
+  category_en  String?  @db.VarChar(255)
+  date_az      String?  @db.VarChar(255)
+  date_en      String?  @db.VarChar(255)
+  title_az     String   @db.VarChar(255)
+  title_en     String?  @db.VarChar(255)
+  summary_az   String?
+  summary_en   String?
+  full_text_az String?
+  full_text_en String?
+  image_url    String?  @db.VarChar(2048)
+  published    Boolean  @default(false)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model partners {
+  id         BigInt   @id @default(autoincrement())
+  name       String   @db.VarChar(255)
+  icon       String?  @db.VarChar(255)
+  published  Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model program_applications {
+  id               BigInt   @id @default(autoincrement())
+  full_name        String   @db.VarChar(255)
+  email            String   @db.VarChar(255)
+  phone            String   @db.VarChar(255)
+  selected_program String   @db.VarChar(255)
+  faculty          String   @db.VarChar(255)
+  status           String   @default("NEW") @db.VarChar(255)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model programs {
+  id             BigInt   @id @default(autoincrement())
+  category       String?  @db.VarChar(255)
+  status         String   @db.VarChar(255)
+  title_az       String   @db.VarChar(255)
+  title_en       String?  @db.VarChar(255)
+  description_az String
+  description_en String?
+  details_az     String?
+  details_en     String?
+  duration_az    String?  @db.VarChar(255)
+  duration_en    String?  @db.VarChar(255)
+  audience_az    String?  @db.VarChar(255)
+  audience_en    String?  @db.VarChar(255)
+  deadline_az    String?  @db.VarChar(255)
+  deadline_en    String?  @db.VarChar(255)
+  period_az      String?  @db.VarChar(255)
+  period_en      String?  @db.VarChar(255)
+  icon           String?  @db.VarChar(255)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model startup_applications {
+  id            BigInt   @id @default(autoincrement())
+  full_name     String   @db.VarChar(255)
+  email         String   @db.VarChar(255)
+  phone         String   @db.VarChar(255)
+  startup_title String   @db.VarChar(255)
+  stage         String   @db.VarChar(255)
+  description   String
+  status        String   @default("NEW") @db.VarChar(255)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model startups {
+  id             BigInt   @id @default(autoincrement())
+  name           String   @db.VarChar(255)
+  logo_text      String?  @db.VarChar(255)
+  logo_color     String?  @db.VarChar(255)
+  tagline_az     String?  @db.VarChar(255)
+  tagline_en     String?  @db.VarChar(255)
+  stage_az       String?  @db.VarChar(255)
+  stage_en       String?  @db.VarChar(255)
+  members        Int?
+  description_az String
+  description_en String?
+  founders       Json?
+  tech_stack     Json?
+  traction_az    String?
+  traction_en    String?
+  website        String?  @db.VarChar(2048)
+  published      Boolean  @default(false)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+}
