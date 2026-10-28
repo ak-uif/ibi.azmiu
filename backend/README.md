@@ -1,6 +1,6 @@
 # İBİ AzMİU backend
 
-Java 21 və Spring Boot 4.1.1 backend-i. Spring Web MVC, Spring Data JPA, PostgreSQL driver, Flyway və Spring Security var. `V1` 10 məzmun/müraciət cədvəlini, `V2` isə `admin_users` cədvəlini yaradır. Məzmun CRUD API-si və public formaların database bağlantısı hələ yoxdur.
+Java 21 və Spring Boot 4.1.1 backend-i. Spring Web MVC, Spring Data JPA, PostgreSQL driver, Flyway, Spring Security və Bean Validation var. `V1` 10 məzmun/müraciət cədvəlini, `V2` isə `admin_users` cədvəlini yaradır. Public formaların database bağlantısı hələ yoxdur.
 
 Windows-da global Maven lazım deyil; `mvnw.cmd` istifadə edin:
 
@@ -16,3 +16,5 @@ Başlamazdan əvvəl `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `ADMIN_USERNAME` v�
 Server portu `8080`-dir. `GET http://localhost:8080/api/health` cavabı `{"status":"ok","service":"ibi-backend"}` olur. Tətbiq başlayanda Flyway migration-ı tətbiq edir və JPA sxemi yoxlayır; health endpoint özü ayrıca database sorğusu etmir.
 
 Authentication API: `GET /api/auth/csrf`, `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout`. Sessiya HttpOnly cookie ilə saxlanır, POST sorğuları CSRF token tələb edir. `GET /api/admin/ping` yalnız admin sessiyası ilə `200`, əks halda `401` qaytarır. Public admin qeydiyyatı yoxdur.
+
+Admin məzmun API-si: `/api/admin/programs`, `/events`, `/news`, `/mentors`, `/startups`, `/partners`. Hər resurs `GET /`, `GET /{id}`, `POST /`, `PUT /{id}` və `DELETE /{id}` dəstəkləyir. `POST` və `PUT` eyni, tam obyekt üçün nəzərdə tutulmuş request formatından istifadə edir; məcburi sahələr yoxlanılır. `POST` 201, silmə 204, tapılmayan ID 404, səhv JSON və ya ID 400 qaytarır. Bütün əməliyyatlar admin sessiyası tələb edir, dəyişdirən sorğulara `X-CSRF-TOKEN` başlığı lazımdır. Cavablar entity yox, ayrıca DTO-dur; xətalar `code` və `message` sahələri ilə qaytarılır. Admin frontend bu API-lərə hələ qoşulmayıb.
