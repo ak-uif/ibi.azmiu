@@ -1,8 +1,10 @@
 import '../style.css';
 import './admin.css';
+import { api } from './api.js';
+import { contentConfig } from './content-config.js';
+import { ContentPanel, escapeHtml } from './panel-content.js';
 
 const app = document.querySelector('#admin-app');
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '');
 let authState = 'unknown';
 const sections = [
   { slug: 'dashboard', label: 'Dashboard', icon: 'grid' },
@@ -41,42 +43,17 @@ const icons = {
 };
 const icon = (name, size = 20) => `<svg aria-hidden="true" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`;
 
-const examples = {
-  applications: [
-    ['Aysel Məmmədova', 'Proqram', 'İnkubasiya proqramı', 'Yeni'],
-    ['Murad Əliyev', 'Tədbir', 'Startap görüşü', 'Baxılır'],
-    ['Nərmin Həsənova', 'Mentor', 'Mentor müraciəti', 'Yeni'],
-    ['Elvin Quliyev', 'Startap', 'İdeya müraciəti', 'Yeni']
-  ],
-  programs: [['İnkubasiya proqramı', 'Qəbul', '12 həftə', 'Aktiv'], ['Startap məktəbi', 'Təlim', '6 həftə', 'Planlaşdırılır']],
-  events: [['Startap görüşü', 'Tədbir', 'Tarix təyin edilməyib', 'Planlaşdırılır']],
-  news: [['İnnovasiya xəbəri', 'Xəbər', 'Qaralama', 'Hazırlanır']],
-  mentors: [['Nümunə mentor', 'Mentor', 'Texnologiya', 'Aktiv']],
-  startups: [['Nümunə startap', 'Startap', 'İdeya', 'Aktiv']],
-  partners: [['Nümunə tərəfdaş', 'Partnyor', 'Əməkdaşlıq', 'Aktiv']],
-  activity: [['Admin', 'Nümunə əməliyyat', 'Bu gün', 'Demo']],
-  settings: [['Panel görünüşü', 'Ayar', 'Frontend nümunəsi', 'Demo']]
-};
-const state = { tab: 0, view: 'data', query: '', filterOpen: false, menuOpen: false };
+const state = { tab: 0, menuOpen: false, dashboard: null, dashboardLoading: false, dashboardError: '' };
+const contentPanel = new ContentPanel(() => { if (contentConfig[route()]) render(); });
 const route = () => {
   const match = location.pathname.match(/^\/admin\/([^/]+)\/?$/);
   return match && sections.some((item) => item.slug === match[1]) ? match[1] : null;
 };
 
-async function apiRequest(path, options = {}) {
-  return fetch(`${apiBaseUrl}${path}`, { credentials: 'include', cache: 'no-store', ...options });
-}
-
-async function csrfToken() {
-  const response = await apiRequest('/api/auth/csrf');
-  if (!response.ok) throw new Error('CSRF request failed');
-  return (await response.json()).token;
-}
-
 async function verifySession() {
   try {
-    const response = await apiRequest('/api/auth/me');
-    authState = response.ok ? 'authenticated' : 'guest';
+    await api.get('/api/auth/me');
+    authState = 'authenticated';
   } catch {
     authState = 'guest';
   }
@@ -97,7 +74,7 @@ function renderLogin() {
           <span class="admin-eyebrow">İDARƏETMƏ PANELİ</span>
           <h1 id="login-title">Admin girişi</h1>
           <p class="admin-muted">İBİ məzmununu və müraciətləri idarə etmək üçün panel görünüşü.</p>
-          <div class="admin-demo-note" role="note">${icon('alert', 18)}<span>Giriş qorunur. Paneldəki məzmun və göstəricilər hələ nümunə məlumatlardır.</span></div>
+          <div class="admin-demo-note" role="note">${icon('alert', 18)}<span>Giriş yalnız icazəli admin hesabı ilə mümkündür. Məzmun lokal backend-dən yüklənir.</span></div>
           <form id="login-form" novalidate>
             <label for="username">İstifadəçi adı</label>
             <input id="username" name="username" type="text" autocomplete="username" placeholder="İstifadəçi adını yazın" required />
@@ -135,21 +112,13 @@ function renderLogin() {
     error.textContent = '';
     button.disabled = true;
     try {
-      const token = await csrfToken();
-      const response = await apiRequest('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-        body: JSON.stringify({ username, password })
-      });
-      if (response.status === 401) {
-        error.textContent = 'İstifadəçi adı və ya şifrə yanlışdır.';
-        return;
-      }
-      if (!response.ok) throw new Error('Login failed');
+      await api.mutate('/api/auth/login', 'POST', { username, password });
       authState = 'authenticated';
+      state.dashboard = null;
+      state.dashboardError = '';
       navigate('dashboard');
-    } catch {
-      error.textContent = 'Giriş mümkün olmadı. Server bağlantısını yoxlayın.';
+    } catch (failure) {
+      error.textContent = failure.status === 401 ? 'İstifadəçi adı və ya şifrə yanlışdır.' : failure.message;
     } finally {
       button.disabled = false;
     }
@@ -157,50 +126,36 @@ function renderLogin() {
 }
 
 function dashboard() {
+  if (state.dashboardLoading) return '<div class="admin-card admin-state" role="status"><span class="admin-spinner"></span><h2>Göstəricilər yüklənir</h2></div>';
+  if (state.dashboardError) return `<div class="admin-card admin-state" role="alert"><h2>Göstəriciləri yükləmək olmadı</h2><p>${escapeHtml(state.dashboardError)}</p><button type="button" class="admin-outline-button" id="dashboard-retry">Yenidən yoxla</button></div>`;
+  const data = state.dashboard;
+  if (!data) return '';
   const stats = [
-    ['Ümumi müraciətlər', '128', 'inbox'],
-    ['Yeni müraciətlər', '12', 'file'],
-    ['Aktiv proqramlar', '4', 'layers'],
-    ['Yaxın tədbirlər', '3', 'calendar']
+    ['Ümumi müraciətlər', '—', 'inbox', 'Müraciət API-si hələ qoşulmayıb'],
+    ['Yeni müraciətlər', '—', 'file', 'Müraciət API-si hələ qoşulmayıb'],
+    ['Aktiv proqramlar', data.programs.filter((item) => ['active', 'open'].includes(item.status)).length, 'layers', 'Database göstəricisi'],
+    ['Dərc edilmiş tədbirlər', data.events.filter((item) => item.published).length, 'calendar', 'Database göstəricisi']
   ];
-  return `
-    <div class="admin-stats">${stats.map(([label, number, symbol]) => `<article class="admin-card admin-stat"><span class="admin-stat-icon">${icon(symbol)}</span><p>${label}</p><strong>${number}</strong><small>Nümunə göstərici</small></article>`).join('')}</div>
-    <div class="admin-dashboard-grid">
-      <section class="admin-card admin-list-card" aria-labelledby="recent-applications"><div class="admin-card-heading"><div><span class="admin-eyebrow">MÜRACİƏTLƏR</span><h2 id="recent-applications">Son müraciətlər</h2></div><a href="/admin/applications" data-route="applications">Hamısına bax ${icon('arrow', 16)}</a></div>
-        <div class="admin-list-row"><span class="admin-avatar">AM</span><div><strong>Aysel Məmmədova</strong><small>İnkubasiya proqramı · nümunə</small></div><span class="admin-pill">Yeni</span></div>
-        <div class="admin-list-row"><span class="admin-avatar">MƏ</span><div><strong>Murad Əliyev</strong><small>Tədbir qeydiyyatı · nümunə</small></div><span class="admin-pill admin-pill-neutral">Baxılır</span></div>
-        <div class="admin-list-row"><span class="admin-avatar">NH</span><div><strong>Nərmin Həsənova</strong><small>Mentor müraciəti · nümunə</small></div><span class="admin-pill">Yeni</span></div>
-      </section>
-      <section class="admin-card admin-list-card" aria-labelledby="recent-activity"><div class="admin-card-heading"><div><span class="admin-eyebrow">PANEL</span><h2 id="recent-activity">Son admin fəaliyyətləri</h2></div></div>
-        <div class="admin-list-row"><span class="admin-activity-icon">${icon('file', 18)}</span><div><strong>Xəbər yeniləndi</strong><small>Nümunə fəaliyyət · 10:42</small></div></div>
-        <div class="admin-list-row"><span class="admin-activity-icon">${icon('calendar', 18)}</span><div><strong>Tədbir əlavə edildi</strong><small>Nümunə fəaliyyət · dünən</small></div></div>
-        <div class="admin-list-row"><span class="admin-activity-icon">${icon('inbox', 18)}</span><div><strong>Müraciətə baxıldı</strong><small>Nümunə fəaliyyət · dünən</small></div></div>
-      </section>
-    </div>`;
+  return `<div class="admin-stats">${stats.map(([label, count, symbol, note]) => `<article class="admin-card admin-stat"><span class="admin-stat-icon">${icon(symbol)}</span><p>${label}</p><strong>${count}</strong><small>${note}</small></article>`).join('')}</div>
+    <div class="admin-dashboard-grid"><section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">MƏZMUN</span><h2>Son proqramlar</h2></div><a href="/admin/programs" data-route="programs">Hamısına bax ${icon('arrow', 16)}</a></div>${data.programs.length ? data.programs.slice(-4).reverse().map((item) => `<div class="admin-list-row"><span class="admin-activity-icon">${icon('layers', 18)}</span><div><strong>${escapeHtml(item.titleAz)}</strong><small>${escapeHtml(item.status)}</small></div></div>`).join('') : '<p class="admin-empty-note">Hələ proqram yoxdur.</p>'}</section>
+    <section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">MÜRACİƏTLƏR</span><h2>Son müraciətlər</h2></div></div><p class="admin-empty-note">Müraciət API-si hələ qoşulmayıb.</p></section>
+    <section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">PANEL</span><h2>Son admin fəaliyyətləri</h2></div></div><p class="admin-empty-note">Fəaliyyət tarixçəsi API-si hələ yoxdur.</p></section></div>`;
+}
+
+async function loadDashboard() {
+  state.dashboardLoading = true;
+  state.dashboardError = '';
+  render();
+  try {
+    const [programs, events] = await Promise.all([api.get('/api/admin/programs'), api.get('/api/admin/events')]);
+    state.dashboard = { programs, events };
+  } catch (error) { state.dashboardError = error.message; }
+  finally { state.dashboardLoading = false; if (route() === 'dashboard') render(); }
 }
 
 function sectionContent(slug) {
-  const item = sections.find((section) => section.slug === slug);
-  const rows = slug === 'applications' && state.tab > 0
-    ? examples.applications.filter((row) => row[1] === applicationTabs[state.tab].slice(0, -3))
-    : examples[slug] || [];
-  const visibleRows = rows.filter((row) => row.join(' ').toLocaleLowerCase('az').includes(state.query.toLocaleLowerCase('az')));
-  let body = '';
-  if (state.view === 'loading') body = `<div class="admin-state" role="status"><span class="admin-spinner"></span><h2>Məlumatlar yüklənir</h2><p>Bu, yüklənmə görünüşünün nümunəsidir.</p></div>`;
-  else if (state.view === 'error') body = `<div class="admin-state" role="alert"><span class="admin-state-icon">${icon('alert', 26)}</span><h2>Məlumatları göstərmək mümkün olmadı</h2><p>Bu, xəta görünüşünün nümunəsidir. Yenidən baxmaq üçün nümunə cədvəli seçin.</p><button class="admin-outline-button" data-view="data">Nümunə cədvələ qayıt</button></div>`;
-  else if (state.view === 'empty' || visibleRows.length === 0) body = `<div class="admin-state"><span class="admin-state-icon">${icon(slug === 'applications' ? 'inbox' : item.icon, 26)}</span><h2>Hələ məlumat yoxdur</h2><p>${state.query ? 'Axtarışınıza uyğun nümunə məlumat tapılmadı.' : 'Bu bölmə real məlumat qoşulduqda burada dolacaq.'}</p></div>`;
-  else body = `<div class="admin-table-scroll"><table><thead><tr><th>Ad / başlıq</th><th>Növ</th><th>Ətraflı</th><th>Status</th></tr></thead><tbody>${visibleRows.map((row) => `<tr><td><strong>${row[0]}</strong></td><td>${row[1]}</td><td>${row[2]}</td><td><span class="admin-pill admin-pill-neutral">${row[3]}</span></td></tr>`).join('')}</tbody></table></div>`;
-  return `
-    ${slug === 'applications' ? `<div class="admin-tabs" role="tablist" aria-label="Müraciət növü">${applicationTabs.map((tab, index) => `<button type="button" role="tab" aria-selected="${state.tab === index}" class="${state.tab === index ? 'active' : ''}" data-tab="${index}">${tab}</button>`).join('')}</div>` : ''}
-    <div class="admin-card admin-section-card">
-      <div class="admin-toolbar"><form id="search-form" class="admin-search"><label class="admin-sr-only" for="section-search">Axtarış</label>${icon('search', 18)}<input id="section-search" type="search" placeholder="${item.label} üzrə axtarış" value="${state.query.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;')}" /><button class="admin-sr-only" type="submit">Axtar</button></form>
-        <div class="admin-toolbar-actions"><div class="admin-filter-wrap"><button class="admin-outline-button" type="button" id="filter-button" aria-expanded="${state.filterOpen}">${icon('filter', 18)} Filter</button>
-          ${state.filterOpen ? `<div class="admin-filter-menu"><label for="view-select">Görünüş nümunəsi</label><select id="view-select"><option value="data" ${state.view === 'data' ? 'selected' : ''}>Nümunə cədvəl</option><option value="empty" ${state.view === 'empty' ? 'selected' : ''}>Boş vəziyyət</option><option value="loading" ${state.view === 'loading' ? 'selected' : ''}>Yüklənmə</option><option value="error" ${state.view === 'error' ? 'selected' : ''}>Xəta</option></select></div>` : ''}</div>
-          <button class="btn-primary admin-add-button" type="button" disabled title="Əlavə etmə funksiyası sonrakı mərhələdə hazırlanacaq">${icon('plus', 18)} Əlavə et</button></div>
-      </div>
-      <div class="admin-table-caption"><span>${state.view === 'data' ? `${visibleRows.length} nümunə qeyd` : 'Görünüş nümunəsi'}</span><span>Frontend demo · real məlumat deyil</span></div>
-      ${body}
-    </div>`;
+  if (contentConfig[slug]) return contentPanel.markup(slug);
+  return `${slug === 'applications' ? `<div class="admin-tabs" role="tablist" aria-label="Müraciət növü">${applicationTabs.map((tab, index) => `<button type="button" role="tab" aria-selected="${state.tab === index}" class="${state.tab === index ? 'active' : ''}" data-tab="${index}">${tab}</button>`).join('')}</div>` : ''}<div class="admin-card admin-section-card"><div class="admin-state"><h2>Bu bölmə hələ API-yə qoşulmayıb</h2><p>Məlumatlar hazır olduqda burada görünəcək.</p></div></div>`;
 }
 
 function renderPanel(slug) {
@@ -213,11 +168,11 @@ function renderPanel(slug) {
         <div class="admin-sidebar-head"><div class="admin-login-brand">${brand()}</div><button class="admin-mobile-close" type="button" aria-label="Menyunu bağla" data-close-menu>${icon('close')}</button></div>
         <div class="admin-sidebar-label">İDARƏETMƏ</div>
         <nav class="admin-nav">${sections.map((section) => `<a href="/admin/${section.slug}" data-route="${section.slug}" class="${section.slug === slug ? 'active' : ''}" ${section.slug === slug ? 'aria-current="page"' : ''}>${icon(section.icon, 19)}<span>${section.label}</span></a>`).join('')}</nav>
-        <div class="admin-sidebar-bottom"><div class="admin-demo-mini">Məzmun <span>Nümunə</span></div><button type="button" id="logout-button">${icon('logout', 19)} Çıxış</button></div>
+        <div class="admin-sidebar-bottom"><div class="admin-demo-mini">Məzmun <span>Database</span></div><button type="button" id="logout-button">${icon('logout', 19)} Çıxış</button></div>
       </aside>
       <div class="admin-main">
         <header class="admin-topbar"><button class="admin-menu-button" type="button" id="menu-button" aria-label="Menyunu aç" aria-expanded="${state.menuOpen}">${icon('menu')}</button><div class="admin-breadcrumb">İdarəetmə paneli <span>/</span> <strong>${item.label}</strong></div><span class="admin-topbar-badge">ADMIN</span></header>
-        <main class="admin-content"><div class="admin-page-head"><div><span class="admin-eyebrow">AZMİU İBİ / ADMIN</span><h1>${item.label}</h1><p>${slug === 'dashboard' ? 'İnkubatorun fəaliyyətinə ümumi baxış' : `${item.label} bölməsinin frontend görünüşü`}</p></div><span class="admin-page-label">Nümunə məlumatlar</span></div>
+        <main class="admin-content"><div class="admin-page-head"><div><span class="admin-eyebrow">AZMİU İBİ / ADMIN</span><h1>${item.label}</h1><p>${slug === 'dashboard' ? 'İnkubatorun fəaliyyətinə ümumi baxış' : contentConfig[slug] ? 'Database qeydlərini idarə edin' : 'Bölmə görünüşü'}</p></div><span class="admin-page-label">${contentConfig[slug] || slug === 'dashboard' ? 'Lokal məlumatlar' : 'Hazırlanır'}</span></div>
           ${slug === 'dashboard' ? dashboard() : sectionContent(slug)}
         </main>
       </div>
@@ -229,12 +184,11 @@ function renderPanel(slug) {
   document.querySelector('#logout-button').addEventListener('click', async (event) => {
     event.currentTarget.disabled = true;
     try {
-      const token = await csrfToken();
-      const response = await apiRequest('/api/auth/logout', {
-        method: 'POST', headers: { 'X-CSRF-TOKEN': token }
-      });
-      if (!response.ok) throw new Error('Logout failed');
+      await api.mutate('/api/auth/logout', 'POST');
       authState = 'guest';
+      contentPanel.cancel();
+      state.dashboard = null;
+      state.dashboardError = '';
       state.menuOpen = false;
       history.pushState({}, '', '/admin');
       render();
@@ -251,28 +205,12 @@ function renderPanel(slug) {
     state.menuOpen = false;
     render();
   }));
-  if (slug !== 'dashboard') {
+  if (contentConfig[slug]) contentPanel.bind(app);
+  else if (slug === 'dashboard') {
+    document.querySelector('#dashboard-retry')?.addEventListener('click', loadDashboard);
+  } else {
     document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('click', () => {
       state.tab = Number(tab.dataset.tab);
-      state.query = '';
-      render();
-    }));
-    document.querySelector('#search-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      state.query = document.querySelector('#section-search').value.trim();
-      render();
-    });
-    document.querySelector('#filter-button').addEventListener('click', () => {
-      state.filterOpen = !state.filterOpen;
-      render();
-    });
-    document.querySelector('#view-select')?.addEventListener('change', (event) => {
-      state.view = event.target.value;
-      state.filterOpen = false;
-      render();
-    });
-    document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => {
-      state.view = button.dataset.view;
       render();
     }));
   }
@@ -281,10 +219,8 @@ function renderPanel(slug) {
 function navigate(slug) {
   if (authState !== 'authenticated' || !sections.some((section) => section.slug === slug)) return;
   state.menuOpen = false;
-  state.filterOpen = false;
-  state.query = '';
-  state.view = 'data';
   state.tab = 0;
+  if (slug === 'dashboard') { state.dashboard = null; state.dashboardError = ''; }
   history.pushState({}, '', `/admin/${slug}`);
   render();
   window.scrollTo(0, 0);
@@ -300,8 +236,24 @@ function render() {
   if (!slug || authState !== 'authenticated') {
     if (slug && authState !== 'authenticated') history.replaceState({}, '', '/admin');
     renderLogin();
-  } else renderPanel(slug);
+  } else {
+    renderPanel(slug);
+    if (contentConfig[slug] && contentPanel.slug !== slug) contentPanel.load(slug, true);
+    if (slug === 'dashboard' && !state.dashboard && !state.dashboardLoading && !state.dashboardError) loadDashboard();
+  }
 }
 
-window.addEventListener('popstate', render);
+window.addEventListener('admin-session-expired', () => {
+  if (authState === 'unknown') return;
+  authState = 'guest';
+  contentPanel.cancel();
+  state.dashboard = null;
+  state.dashboardError = '';
+  history.replaceState({}, '', '/admin');
+  render();
+});
+window.addEventListener('popstate', () => {
+  if (route() === 'dashboard') { state.dashboard = null; state.dashboardError = ''; }
+  render();
+});
 render();

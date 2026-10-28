@@ -20,10 +20,11 @@ Repo kökündə:
 ```powershell
 npm ci
 npm run dev
+npm run test:admin
 npm run build
 ```
 
-Vite terminalda local ünvanı göstərir. `/admin` real backend login-inə qoşulur; dashboard-dakı məzmun hələ nümunədir və public formalar database-ə yazmır. Frontend üçün `VITE_API_BASE_URL=http://localhost:8080` təyin edin. Bu dəyişən public URL-dir, şifrə deyil.
+Vite terminalda local ünvanı göstərir. `/admin` real backend login-inə qoşulur. Admin panelində proqram, tədbir, xəbər, mentor, startap və partnyor qeydləri lokal backend API-sindən yüklənir və idarə olunur. Proqram `status` sahəsində arxivlənmiş qeyd bərpa ediləndə `draft` olur; digər beş bölmədə `published` ilə dərc/yayından çıxarma işləyir. Müraciət və fəaliyyət göstəriciləri üçün hələ API yoxdur; public saytın nümunə məzmunu və formaları database-ə qoşulmayıb. Frontend üçün `VITE_API_BASE_URL=http://localhost:8080` təyin edin. Bu dəyişən public URL-dir, şifrə deyil.
 
 ## Backend və database
 
