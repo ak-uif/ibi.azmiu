@@ -1,3 +1,5 @@
+import { contentTypes, contentStateMarkup, createContentStore, splitPrograms } from './public-content.js';
+
 /**
  * AzMİU İBİ (Innovative Business Incubator) Core Application Engine
  * Dual-language system (AZ / EN), dynamic modal controller (4 distinct forms),
@@ -32,17 +34,17 @@ const translations = {
     
     // Hero Floating Cards
     cardIdeasTitle: "İdeyalar",
-    cardIdeasDesc: "180+ Təqdim edilmiş layihə",
+    cardIdeasDesc: "İdeyanızı paylaşın",
     cardStartupsTitle: "Startaplar",
-    cardStartupsDesc: "40+ İnkubasiya məzunu",
+    cardStartupsDesc: "Startaplarla tanış olun",
     cardImpactTitle: "Dəstək",
     cardImpactDesc: "MVP Prototipləmə Dəstəyi",
     cardMentorsTitle: "Mentorlar",
-    cardMentorsDesc: "50+ Sənaye eksperti",
+    cardMentorsDesc: "Mentorlarla tanış olun",
     cardNetworkTitle: "Şəbəkə",
-    cardNetworkDesc: "20+ Korporativ tərəfdaş",
+    cardNetworkDesc: "Tərəfdaşları kəşf edin",
     cardGrowthTitle: "İnkişaf",
-    cardGrowthDesc: "94% Layihə uğur nisbəti",
+    cardGrowthDesc: "İnkişaf yolunuzu qurun",
 
     // About Section
     aboutBadge: "Haqqımızda",
@@ -60,7 +62,7 @@ const translations = {
     // Counter Stats
     statStartups: "Startap",
     statMentors: "Mentor",
-    statStudents: "Tələbə",
+    statStudents: "Proqram",
     statPartners: "Tərəfdaş",
 
     // Programs Section
@@ -73,7 +75,7 @@ const translations = {
     filterEvents: "Tədbirlər",
     pastProgramsBadge: "Arxiv",
     pastProgramsTitle: "Keçmiş proqramlar",
-    pastProgramsSubtitle: "Aşağıdakı nümunələr şablon məlumatdır.",
+    pastProgramsSubtitle: "Tamamlanmış proqramlar burada göstərilir.",
     pastProgramsPeriod: "Keçirilmə dövrü",
     pastProgramsCompleted: "Başa çatıb",
     pastProgramsDetailsBtn: "Ətraflı",
@@ -269,17 +271,17 @@ const translations = {
 
     // Hero Floating Cards
     cardIdeasTitle: "Ideas",
-    cardIdeasDesc: "180+ Submitted projects",
+    cardIdeasDesc: "Share your idea",
     cardStartupsTitle: "Startups",
-    cardStartupsDesc: "40+ Incubation graduates",
+    cardStartupsDesc: "Meet the startups",
     cardImpactTitle: "Support",
     cardImpactDesc: "MVP Prototyping Support",
     cardMentorsTitle: "Mentors",
-    cardMentorsDesc: "50+ Industry leaders",
+    cardMentorsDesc: "Meet the mentors",
     cardNetworkTitle: "Network",
-    cardNetworkDesc: "20+ Corporate partners",
+    cardNetworkDesc: "Explore partners",
     cardGrowthTitle: "Growth",
-    cardGrowthDesc: "94% Venture survival rate",
+    cardGrowthDesc: "Build your path forward",
 
     // About Section
     aboutBadge: "About Us",
@@ -297,7 +299,7 @@ const translations = {
     // Counter Stats
     statStartups: "Startups",
     statMentors: "Mentors",
-    statStudents: "Students",
+    statStudents: "Programs",
     statPartners: "Partners",
 
     // Programs Section
@@ -310,7 +312,7 @@ const translations = {
     filterEvents: "Events",
     pastProgramsBadge: "Archive",
     pastProgramsTitle: "Past programs",
-    pastProgramsSubtitle: "The examples below are placeholder content.",
+    pastProgramsSubtitle: "Completed programs are shown here.",
     pastProgramsPeriod: "Program period",
     pastProgramsCompleted: "Completed",
     pastProgramsDetailsBtn: "Details",
@@ -490,412 +492,55 @@ let currentLang = "az";
 // 2. DATASETS (PROGRAMS, STARTUPS, EVENTS, NEWS, MENTORS)
 // ==========================================
 
-const PROGRAMS_DATA = [
-  {
-    id: "prog-1",
-    category: "incubation",
-    status: "open",
-    statusBadge: { az: "Qəbul Açıqdır", en: "Applications Open" },
-    title: {
-      az: "BIM & PropTech İnkubasiya 2026",
-      en: "BIM & PropTech Incubation 2026"
-    },
-    description: {
-      az: "Ağıllı tikinti, bina informasiya modelləşdirilməsi (BIM) və şəhərsalma texnologiyaları üzrə komandalar üçün 12 həftəlik sürətli inkişaf proqramı.",
-      en: "A 12-week rigorous incubation program for teams developing smart construction, BIM workflows, and urban planning tech."
-    },
-    duration: { az: "12 Həftə", en: "12 Weeks" },
-    audience: { az: "AzMİU Tələbə və Məzunları", en: "AUAC Students & Alumni" },
-    deadline: { az: "25 Aprel 2026", en: "April 25, 2026" },
-    icon: "building-2"
-  },
-  {
-    id: "prog-2",
-    category: "education",
-    status: "active",
-    statusBadge: { az: "Aktivdir", en: "Active" },
-    title: {
-      az: "Startap Akademiyası: 0-dan MVP-yə",
-      en: "Startup Academy: Zero to MVP"
-    },
-    description: {
-      az: "İdeyanın doğrulanması, biznes model kətanı, maliyyə planlaması və prototipləmə əsaslarını əhatə edən praktiki modul təlimləri.",
-      en: "Hands-on modular workshops covering idea validation, business model canvas, financial projections, and rapid prototyping."
-    },
-    duration: { az: "6 Həftə", en: "6 Weeks" },
-    audience: { az: "Bütün Fakültələrin Tələbələri", en: "All University Students" },
-    deadline: { az: "Davam edir", en: "In Progress" },
-    icon: "graduation-cap"
-  },
-  {
-    id: "prog-3",
-    category: "incubation",
-    status: "open",
-    statusBadge: { az: "Qəbul Açıqdır", en: "Applications Open" },
-    title: {
-      az: "GreenTech & Eko-Memarlıq Akseleratoru",
-      en: "GreenTech & Eco-Architecture Accelerator"
-    },
-    description: {
-      az: "Bərpa olunan enerji, karbon emissiyasının azaldılması və dayanıqlı tikinti materialları yaradan startaplar üçün toxum maliyyə dəstəkli proqram.",
-      en: "Seed-funded accelerator for startups advancing renewable building systems, carbon reduction, and sustainable construction materials."
-    },
-    duration: { az: "16 Həftə", en: "16 Weeks" },
-    audience: { az: "Tədqiqatçılar və Magistrlər", en: "Researchers & MSc Students" },
-    deadline: { az: "10 May 2026", en: "May 10, 2026" },
-    icon: "leaf"
-  },
-  {
-    id: "prog-4",
-    category: "events",
-    status: "soon",
-    statusBadge: { az: "Tezliklə", en: "Coming Soon" },
-    title: {
-      az: "Smart Baku Hakatonu 2026",
-      en: "Smart Baku Hackathon 2026"
-    },
-    description: {
-      az: "Ağıllı şəhər infrastrukturu, nəqliyyat optimizasiyası və sensor şəbəkələri mövzusunda 48 saatlıq intensiv komanda yarışması.",
-      en: "A 48-hour continuous hackathon tackling urban mobility, intelligent infrastructure, and IoT municipal sensor grids."
-    },
-    duration: { az: "48 Saat", en: "48 Hours" },
-    audience: { az: "Mühəndis, Dizayner və Proqramçılar", en: "Engineers, Designers & Coders" },
-    deadline: { az: "1 İyun 2026", en: "June 1, 2026" },
-    icon: "zap"
-  }
-];
+let PROGRAMS_DATA = [];
+let PAST_PROGRAMS_DATA = [];
+let STARTUPS_DATA = [];
+let EVENTS_DATA = [];
+let NEWS_DATA = [];
+let MENTORS_DATA = [];
+let PARTNERS_DATA = [];
 
-const PAST_PROGRAMS_DATA = [
-  {
-    id: "past-program-1",
-    title: { az: "Startap ideyası laboratoriyası", en: "Startup Idea Lab" },
-    description: {
-      az: "İdeyanın yoxlanması və ilk prototipin hazırlanması üzrə nümunə təlim proqramı.",
-      en: "A sample training program for validating ideas and building a first prototype."
-    },
-    details: {
-      az: "Bu nümunə proqram iştirakçılara problemin düzgün müəyyənləşdirilməsi, istifadəçi müsahibələrinin aparılması və ilkin biznes modelinin qurulması mövzularında praktiki bilik verib. Komandalar mentorlarla birlikdə ideyalarını sınaqdan keçirib, üç həftə ərzində işlək prototip hazırlayıb və yekunda münsiflər qarşısında təqdimat ediblər.",
-      en: "This sample program gave participants practical guidance on problem discovery, user interviews, and early business-model design. Teams validated their ideas with mentors, built a working prototype over three weeks, and presented the results to a jury."
-    },
-    period: { az: "Mart – May 2025", en: "March – May 2025" },
-    icon: "lightbulb"
-  },
-  {
-    id: "past-program-2",
-    title: { az: "Rəqəmsal şəhər həlləri", en: "Digital City Solutions" },
-    description: {
-      az: "Şəhər mühiti üçün rəqəmsal xidmətlərə həsr olunmuş şablon inkubasiya proqramı.",
-      en: "A sample incubation program focused on digital services for urban life."
-    },
-    details: {
-      az: "Şablon inkubasiya proqramında şəhər nəqliyyatı, kommunal xidmətlər və vətəndaş müraciətlərinin rəqəmsallaşdırılması üzrə layihələr hazırlanıb. İştirakçılar açıq şəhər məlumatları ilə işləyib, xidmət prototipləri qurub və həllərini bələdiyyə və sənaye nümayəndələrinə təqdim ediblər.",
-      en: "This sample incubation program focused on digital solutions for mobility, public utilities, and citizen services. Participants worked with open urban data, produced service prototypes, and presented their solutions to municipal and industry representatives."
-    },
-    period: { az: "Sentyabr – Noyabr 2025", en: "September – November 2025" },
-    icon: "building-2"
-  },
-  {
-    id: "past-program-3",
-    title: { az: "Yaşıl tikinti innovasiyaları", en: "Green Building Innovations" },
-    description: {
-      az: "Dayanıqlı materiallar və enerji səmərəliliyi mövzusunda nümunə akselerasiya proqramı.",
-      en: "A sample accelerator for sustainable materials and energy efficiency."
-    },
-    details: {
-      az: "Bu nümunə akselerasiya proqramı enerji səmərəli materiallar, ağıllı enerji idarəetməsi və tikinti tullantılarının təkrar istifadəsi mövzularını əhatə edib. Seçilmiş komandalar laboratoriya sınaqları, karbon izi hesablamaları və pilot tətbiq planı üzrə mütəxəssis dəstəyi alıblar.",
-      en: "This sample accelerator covered energy-efficient materials, smart energy management, and construction-waste reuse. Selected teams received expert support for laboratory testing, carbon-footprint calculations, and pilot implementation planning."
-    },
-    period: { az: "Fevral – Aprel 2026", en: "February – April 2026" },
-    icon: "leaf"
-  }
-];
+const contentStore = createContentStore(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
+const publicStates = contentStore.state;
+function renderContentState(container, type, filteredCount = null) {
+  const state = publicStates[type].status;
+  if (state === 'ready' && filteredCount !== 0) return false;
+  container.innerHTML = contentStateMarkup(state === 'ready' ? 'empty' : state, currentLang);
+  return true;
+}
 
-const STARTUPS_DATA = [
-  {
-    id: "startup-1",
-    name: "ArchAI",
-    logoText: "AA",
-    logoColor: "from-cyan-500 to-blue-600",
-    tagline: {
-      az: "Süni İntellekt əsaslı memarlıq layihələndirməsi",
-      en: "Generative AI floorplan & architectural synthesis"
-    },
-    stage: { az: "Seed Mərhələsi", en: "Seed Stage" },
-    members: 5,
-    description: {
-      az: "ArchAI memarlıq şirkətlərinə şəhərsalma normativlərinə 100% uyğunlaşdırılmış mərtəbə planlarını və 3D karkas modellərini saniyələr içində generasiya etmək imkanı verir.",
-      en: "ArchAI empowers architectural firms to synthesize regulatory-compliant floor plans and structural 3D shells within seconds using fine-tuned spatial AI."
-    },
-    founders: [
-      { name: "Orxan Quliyev", role: { az: "Həmtəsisçi & Baş Mühəndis", en: "Co-Founder & Lead Engineer" } },
-      { name: "Leyla Məmmədova", role: { az: "Həmtəsisçi & Baş Memar", en: "Co-Founder & Chief Architect" } }
-    ],
-    techStack: ["PyTorch", "Three.js", "Revit API", "FastAPI", "React"],
-    traction: {
-      az: "12 aktiv korporativ sınaq lisenziyası və laboratoriya sınaqları",
-      en: "12 active enterprise pilot contracts and lab validations"
-    },
-    website: "https://archai.example.com"
-  },
-  {
-    id: "startup-2",
-    name: "EcoConcrete",
-    logoText: "EC",
-    logoColor: "from-emerald-500 to-teal-600",
-    tagline: {
-      az: "Təkrar emal edilmiş kompozit sənaye betonu",
-      en: "Ultra-low carbon geopolymetric recycled concrete"
-    },
-    stage: { az: "MVP & Pilot Sınaq", en: "MVP & Pilot Phase" },
-    members: 4,
-    description: {
-      az: "Sənaye tullantılarından və vulkanik küllərdən istifadə edərək 65% daha aşağı karbon izinə və 30% daha yüksək seysmik dayanıqlığa malik yeni nəsil tikinti blokları istehsal edir.",
-      en: "Manufactures next-generation modular building aggregates using industrial slag and volcanic pozzolans, lowering embodied carbon by 65% while increasing shear strength."
-    },
-    founders: [
-      { name: "Kamran Əliyev", role: { az: "Materialşünas & Təsisçi", en: "Materials Scientist & Founder" } },
-      { name: "Nigar Həsənli", role: { az: "Əməliyyat Direktoru", en: "COO & Civil Engineer" } }
-    ],
-    techStack: ["Geopolymer Chem", "ASTM C39 Standards", "IoT curing sensors"],
-    traction: {
-      az: "3 yerli tikinti holdinqi ilə pilot razılaşma",
-      en: "3 formal LOIs with national civil contractors"
-    },
-    website: "https://ecoconcrete.example.com"
-  },
-  {
-    id: "startup-3",
-    name: "BuildSense IoT",
-    logoText: "BS",
-    logoColor: "from-violet-500 to-indigo-600",
-    tagline: {
-      az: "İnşaat obyektlərində simsiz təhlükəsizlik və telemetriya",
-      en: "Autonomous wireless telemetry & jobsite safety"
-    },
-    stage: { az: "Böyümə Mərhələsi", en: "Growth Stage" },
-    members: 6,
-    description: {
-      az: "İnşaat meydançalarında kranların, beton tökmə hərarətinin və işçi təhlükəsizliyinin real zaman rejimində LoRaWAN sensorları vasitəsilə vahid rəqəmsal xəritədə monitorinqi.",
-      en: "Unified digital twin sensor network monitoring structural curing kinetics, crane clearance vectors, and personnel safety helmets via LoRaWAN."
-    },
-    founders: [
-      { name: "Elvin Rzayev", role: { az: "IoT Sistem Arxitektoru", en: "Lead IoT Architect" } },
-      { name: "Fərid Babayev", role: { az: "Məhsul Rəhbəri", en: "Head of Product" } }
-    ],
-    techStack: ["LoRaWAN", "Go Backend", "Next.js", "TimescaleDB", "Flutter"],
-    traction: {
-      az: "Aktiv pilot obyektlərində quraşdırılıb və real zaman rejimində işləyir",
-      en: "Deployed at active pilot sites with real-time monitoring"
-    },
-    website: "https://buildsense.example.com"
-  },
-  {
-    id: "startup-4",
-    name: "SolarTile Baku",
-    logoText: "ST",
-    logoColor: "from-amber-500 to-orange-600",
-    tagline: {
-      az: "Dam örtükləri üçün estetik fotovoltaik keramik plitələr",
-      en: "Building-integrated aesthetic solar roof tiles"
-    },
-    stage: { az: "İnkubasiya", en: "Incubation" },
-    members: 3,
-    description: {
-      az: "Tarixi və müasir binaların dam estetikasını pozmadan günəş enerjisi toplayan monokristal fotovoltaik dam örtüklərinin layihələndirilməsi və istehsalı.",
-      en: "Patented ceramic-integrated monocrystalline solar tiles engineered to preserve classical and modern architectural silhouettes while generating clean grid electricity."
-    },
-    founders: [
-      { name: "Aysel Qasımova", role: { az: "Bərpa Olunan Enerji Mühəndisi", en: "Renewable Systems Lead" } },
-      { name: "Tural Səfərov", role: { az: "Sənaye Dizayneri", en: "Industrial Designer" } }
-    ],
-    techStack: ["Perovskite-Silicon Cells", "SolidWorks", "ANSYS Thermal"],
-    traction: {
-      az: "AzMİU laboratoriyasında sınaqdan keçən 2 patent prototipi",
-      en: "2 functional lab prototypes with pending utility patent"
-    },
-    website: "https://solartile.example.com"
-  }
-];
-
-const EVENTS_DATA = [
-  {
-    id: "event-1",
-    day: "28",
-    month: { az: "SENT", en: "SEP" },
-    title: {
-      az: "PropTech & BIM İnnovasiya Sammiti 2026",
-      en: "PropTech & BIM Innovation Summit 2026"
-    },
-    location: {
-      az: "AzMİU Əsas Korpus, Konfrans Zalı",
-      en: "AUAC Main Campus, Grand Conference Hall"
-    },
-    time: { az: "14:00 - 18:00", en: "2:00 PM - 6:00 PM" },
-    attendees: "95/120",
-    speaker: {
-      az: "Dr. Elşad Qasımov (BIM eksperti, Foster+Partners məzunu)",
-      en: "Dr. Elshad Gasimov (BIM Specialist, ex-Foster+Partners)"
-    },
-    description: {
-      az: "Tikinti sektorunda rəqəmsal transformasiya, rəqəmsal əkizlər və startapların iri inşaat korporasiyaları ilə inteqrasiyası müzakirə olunacaq.",
-      en: "Exploring digital twins, industrial BIM interoperability, and strategies for early-stage university startups to partner with commercial EPC contractors."
-    },
-    details: {
-      az: "Sammitdə BIM əsaslı layihə idarəetməsi, rəqəmsal əkizlərin real obyektlərdə tətbiqi və universitet startaplarının iri tikinti şirkətləri ilə pilot əməkdaşlığı müzakirə olunacaq. Proqram ekspert çıxışları, real layihə nümunələri, sual-cavab sessiyası və şəbəkələşmə hissəsindən ibarətdir.",
-      en: "The summit covers BIM-based project management, real-world digital-twin deployment, and pilot partnerships between university startups and major construction companies. The program includes expert talks, case studies, a Q&A session, and networking."
-    }
-  },
-  {
-    id: "event-2",
-    day: "12",
-    month: { az: "OKT", en: "OCT" },
-    title: {
-      az: "İdeyadan İnvestisiyaya: Vençur Sahibkarlığı Təlimi",
-      en: "From Napkin to Term Sheet: VC Masterclass"
-    },
-    location: {
-      az: "AzMİU İnkubator Coworking Mərkəzi",
-      en: "AUAC Incubator Coworking Hub"
-    },
-    time: { az: "16:00 - 19:30", en: "4:00 PM - 7:30 PM" },
-    attendees: "42/50",
-    speaker: {
-      az: "Rauf Həsənov (SABAH.fund İnvestisiya Direktoru)",
-      en: "Rauf Hasanov (Investment Director, SABAH.fund)"
-    },
-    description: {
-      az: "Startap qiymətləndirilməsi, cap table quruluşu, pitç-dek hazırlığı və investorlarla danışıqların incəlikləri barədə intensiv seminar.",
-      en: "A comprehensive deep dive into early startup valuations, cap table hygiene, investor pitch deck storytelling, and term-sheet negotiation tactics."
-    },
-    details: {
-      az: "İntensiv təlimdə startapın ilkin qiymətləndirilməsi, təsisçi paylarının düzgün bölünməsi, investora təqdimatın strukturu və danışıqlar zamanı əsas şərtlər izah ediləcək. İştirakçılar nümunə cap table quracaq və öz pitçlərini ekspert rəyi ilə təkmilləşdirəcəklər.",
-      en: "This intensive session explains early-stage valuation, founder equity allocation, investor-pitch structure, and key negotiation terms. Participants will build a sample cap table and improve their own pitch with expert feedback."
-    }
-  },
-  {
-    id: "event-3",
-    day: "24",
-    month: { az: "OKT", en: "OCT" },
-    title: {
-      az: "FabLab 3D Prototipləmə Praktik Vorkşopu",
-      en: "Hands-on 3D Rapid Prototyping Workshop"
-    },
-    location: {
-      az: "AzMİU İnnovasiya Mərkəzi, FabLab",
-      en: "AUAC Innovation Center, FabLab"
-    },
-    time: { az: "11:00 - 15:00", en: "11:00 AM - 3:00 PM" },
-    attendees: "28/30",
-    speaker: {
-      az: "Samir Mirzəyev (FabLab Mühəndisi)",
-      en: "Samir Mirzayev (Lead FabLab Engineer)"
-    },
-    description: {
-      az: "Tələbələr öz 3D CAD modellərini sənaye printerlərində və lazer kəsicilərdə real fiziki maketlərə çevirməyi praktiki öyrənəcəklər.",
-      en: "Participants learn hands-on slice modeling, SLA/FDM 3D printing calibration, and laser cutting to assemble tangible working physical prototypes."
-    },
-    details: {
-      az: "Praktik vorkşop zamanı iştirakçılar CAD modelinin istehsala hazırlanması, material seçimi, 3D printer parametrləri və lazer kəsim təhlükəsizliyi ilə tanış olacaqlar. Hər iştirakçı kiçik bir detal hazırlayacaq, çap prosesini izləyəcək və yekun maketin yığılmasında iştirak edəcək.",
-      en: "During this hands-on workshop, participants learn production-ready CAD preparation, material selection, printer settings, and laser-cutting safety. Each participant will prepare a small component, monitor the print, and help assemble a final prototype."
+async function loadPublicContent(type) {
+  await contentStore.load(type);
+  const rows = publicStates[type].rows;
+  if (publicStates[type].status === 'ready') {
+    const counter = document.querySelector(`[data-content-count="${type}"]`);
+    if (counter) {
+      counter.dataset.target = String(rows.length);
+      counter.textContent = String(rows.length);
     }
   }
-];
-
-const NEWS_DATA = [
-  {
-    id: "news-1",
-    category: { az: "Qrant & Qələbə", en: "Grant & Award" },
-    date: { az: "18 Mart 2026", en: "March 18, 2026" },
-    title: {
-      az: "AzMİU İBİ startapı innovasiya müsabiqəsində qalib gəldi",
-      en: "AUAC Incubator startup triumphs at national innovation challenge"
-    },
-    summary: {
-      az: "İnkubatorumuzun yetirməsi olan 'EcoConcrete' komandası müsabiqədə uğur qazanaraq prototipləmə və laboratoriya dəstəyi əldə etdi.",
-      en: "Our resident team 'EcoConcrete' triumphed at the national challenge, securing advanced prototyping backing and lab access."
-    },
-    fullText: {
-      az: "Azərbaycan Memarlıq və İnşaat Universiteti İnnovativ Biznes İnkubatorunun yetirməsi olan 'EcoConcrete' startapı İnnovasiya və Rəqəmsal İnkişaf Agentliyinin (IRIA) təşkil etdiyi illik milli innovasiya müsabiqəsində qalib elan edildi. Layihə sənaye tullantılarından ultra-aşağı karbonlu geopolimer kompozit beton istehsalını nəzərdə tutur. Göstərilən texniki dəstək hesabına komanda AzMİU FabLab bazasında sınaq xəttini quracaq və pilot bloklarını yerli inşaat şirkətlərinə sınaq üçün təqdim edəcəkdir.",
-      en: "EcoConcrete, an incubated startup originating from the labs of the Azerbaijan University of Architecture and Construction, has been officially awarded top honors in the annual innovation challenge organized by the Innovation and Digital Development Agency (IRIA). The project manufactures ultra-low carbon geopolymetric construction materials from recycled industrial waste. With specialized lab and prototyping backing, the team will scale pilot blocks inside the AUAC FabLab."
-    },
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "news-2",
-    category: { az: "Beynəlxalq Tərəfdaşlıq", en: "Global Alliance" },
-    date: { az: "02 Mart 2026", en: "March 2, 2026" },
-    title: {
-      az: "Avropanın aparıcı texniki universitetləri ilə yeni mübadilə proqramı",
-      en: "New venture exchange pact signed with top European technical hubs"
-    },
-    summary: {
-      az: "AzMİU İBİ startapları Milan Politexnik Universiteti və Delft Texniki Universiteti inkubatorlarında təcrübə keçmək imkanı qazanırlar.",
-      en: "AUAC incubator founders will now participate in bilateral acceleration exchanges with Politecnico di Milano and TU Delft venture incubators."
-    },
-    fullText: {
-      az: "Azərbaycan Memarlıq və İnşaat Universiteti İnnovativ Biznes İnkubatoru Avropanın qabaqcıl arxitektura və mühəndislik məktəbləri ilə strateji memorandum imzalayıb. Razılaşmaya əsasən hər il AzMİU İBİ-nin ən uğurlu 3 startap komandası 4 həftə müddətində Milan və Delft şəhərlərindəki akselerasiya mərkəzlərində Avropa vençur fondları ilə pitçinq görüşlərinə qatılacaq, həmçinin beynəlxalq sertifikatlaşdırma dəstəyi alacaqlar.",
-      en: "AUAC Innovative Business Incubator has formalized a tripartite venture partnership with the entrepreneurship ecosystems of Politecnico di Milano and TU Delft. The flagship program entitles the top 3 cohort startups annually to take residency in European innovation labs, pitch directly to continental green infrastructure venture funds, and accelerate EU-standard CE mark certifications."
-    },
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "news-3",
-    category: { az: "İnkubator İnfrastrukturu", en: "Campus Milestone" },
-    date: { az: "15 Fevral 2026", en: "February 15, 2026" },
-    title: {
-      az: "Yeni Nəsil 'BIM & VR Simulyasiya Mərkəzi' istifadəyə verildi",
-      en: "State-of-the-art 'BIM & VR Simulation Laboratory' inaugurated"
-    },
-    summary: {
-      az: "Tələbələr və startapçılar üçün ən son texnologiyalı virtual reallıq eynəkləri və güclü qrafik iş stansiyaları ilə təchiz olunmuş laboratoriya açıldı.",
-      en: "A modern co-working and simulation facility outfitted with enterprise VR headgear and high-throughput rendering nodes is now fully open."
-    },
-    fullText: {
-      az: "AzMİU kampusunda fəaliyyət göstərən İnkubatorun nəzdində yeni 'BIM və VR Simulyasiya Mərkəzi' qapılarını innovativ gənclərin üzünə açdı. Mərkəz memarlıq layihələrini tikinti başlamazdan əvvəl 1:1 miqyasda virtual təcrübədən keçirməyə, akustik və istilik izolyasiyası simulyasiyaları aparmağa imkan verən qabaqcıl sensor avadanlıqları ilə təmin olunmuşdur.",
-      en: "The AzMİU incubator has officially cut the ribbon on its advanced BIM & VR Simulation Laboratory. Built to serve incubated teams and researchers, the facility features dedicated GPU-accelerated computing rigs and enterprise spatial headsets, allowing founders to walk clients through 1:1 scale immersive digital architecture and test thermal simulations in real time."
-    },
-    image: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=800&q=80"
+  if (type === 'programs') {
+    ({ current: PROGRAMS_DATA, past: PAST_PROGRAMS_DATA } = splitPrograms(rows));
+    renderPrograms(currentProgramsFilter);
+    renderPastPrograms();
+  } else {
+    if (type === 'startups') { STARTUPS_DATA = rows; renderStartups(); }
+    if (type === 'events') { EVENTS_DATA = rows; renderEvents(); }
+    if (type === 'news') { NEWS_DATA = rows; renderNews(); }
+    if (type === 'mentors') { MENTORS_DATA = rows; renderMentors(currentMentorsFilter); }
+    if (type === 'partners') { PARTNERS_DATA = rows; renderPartners(); }
   }
-];
+}
 
-const MENTORS_DATA = [
-  {
-    id: "mentor-1",
-    name: "Teymur Məmmədov",
-    role: { az: "Baş Texnoloji Direktor, PropTech Labs", en: "Chief Technology Officer, PropTech Labs" },
-    category: "it",
-    skills: ["AI Systems", "Cloud Arch", "Python", "Revit API"],
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
-    socials: { linkedin: "https://linkedin.com", github: "https://github.com" }
-  },
-  {
-    id: "mentor-2",
-    name: "Aynur Hüseynova",
-    role: { az: "Rəqəmsal Marketinq və Böyümə Direktoru", en: "VP of Growth & Digital Marketing" },
-    category: "marketing",
-    skills: ["Growth Hacking", "B2B SaaS", "Brand Strategy", "GTM"],
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80",
-    socials: { linkedin: "https://linkedin.com", github: "https://github.com" }
-  },
-  {
-    id: "mentor-3",
-    name: "Murad Səlimov",
-    role: { az: "Aparıcı Şəhərsalma Arxitektoru", en: "Principal Urban Architect & BIM Lead" },
-    category: "design",
-    skills: ["BIM Level 3", "Computational Design", "Rhino/Grasshopper", "UI/UX"],
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
-    socials: { linkedin: "https://linkedin.com", github: "https://github.com" }
-  },
-  {
-    id: "mentor-4",
-    name: "Rəşad Vəliyev",
-    role: { az: "Vençur İnvestoru & Sahibkar", en: "Venture Partner & Angel Investor" },
-    category: "business",
-    skills: ["Fundraising", "Cap Table", "Financial Modeling", "Corporate Strategy"],
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80",
-    socials: { linkedin: "https://linkedin.com", github: "https://github.com" }
-  }
-];
+function renderPartners() {
+  const container = document.getElementById('partners-track');
+  if (!container) return;
+  container.classList.toggle('is-static', publicStates.partners.status !== 'ready' || PARTNERS_DATA.length === 0);
+  if (renderContentState(container, 'partners', PARTNERS_DATA.length)) return;
+  const cards = PARTNERS_DATA.map((partner) => `<div class="flex items-center gap-3 px-6 py-3 rounded-2xl glass-panel text-slate-600 font-bold tracking-wide shrink-0"><i data-lucide="${partner.icon}" class="w-5 h-5 text-blue-700"></i><span>${partner.name}</span></div>`).join('');
+  container.innerHTML = cards + cards;
+  window.lucide?.createIcons?.();
+}
 
 // ==========================================
 // 3. LANGUAGE SWITCHING ENGINE
@@ -945,6 +590,7 @@ function updateLanguage(newLang) {
   renderEvents();
   renderNews();
   renderMentors(currentMentorsFilter);
+  renderPartners();
 
   // If modal is currently open, refresh active form text
   if (currentActiveModalType) {
@@ -995,7 +641,8 @@ function animateNumbers() {
 
   counters.forEach((counter) => {
     const target = parseInt(counter.getAttribute("data-target"), 10);
-    const suffix = counter.getAttribute("data-suffix") || "+";
+    if (Number.isNaN(target)) return;
+    const suffix = counter.getAttribute("data-suffix") || "";
     let frame = 0;
 
     const timer = setInterval(() => {
@@ -1113,10 +760,7 @@ function renderPrograms(filter = "all") {
 
   container.innerHTML = "";
 
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500">Bu kateqoriyada hələlik proqram yoxdur.</div>`;
-    return;
-  }
+  if (renderContentState(container, 'programs', filtered.length)) return;
 
   filtered.forEach((prog) => {
     const card = document.createElement("div");
@@ -1130,7 +774,7 @@ function renderPrograms(filter = "all") {
       <div>
         <div class="flex items-center justify-between gap-2 mb-4">
           <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${badgeClass}">
-            ${prog.statusBadge[currentLang]}
+            ${({ open: currentLang === "az" ? "Qəbul açıqdır" : "Applications open", active: currentLang === "az" ? "Aktivdir" : "Active", soon: currentLang === "az" ? "Tezliklə" : "Coming soon" })[prog.status] || ""}
           </span>
           <div class="p-2.5 rounded-xl bg-white border border-slate-200 text-blue-700">
             <i data-lucide="${prog.icon}" class="w-5 h-5"></i>
@@ -1195,6 +839,7 @@ function renderPastPrograms() {
   if (!container) return;
 
   const t = translations[currentLang];
+  if (renderContentState(container, 'programs', PAST_PROGRAMS_DATA.length)) return;
   container.innerHTML = PAST_PROGRAMS_DATA.map((program) => `
     <article class="past-program-card rounded-2xl border border-slate-200 bg-white p-6 flex flex-col">
       <div class="mb-5 flex items-center justify-between gap-3">
@@ -1274,8 +919,8 @@ function openDetailsModal(type, id) {
   const t = translations[currentLang];
   const isProgram = type === "program";
   const item = isProgram
-    ? PAST_PROGRAMS_DATA.find((program) => program.id === id)
-    : EVENTS_DATA.find((event) => event.id === id);
+    ? PAST_PROGRAMS_DATA.find((program) => program.id === Number(id))
+    : EVENTS_DATA.find((event) => event.id === Number(id));
   if (!item) return;
 
   currentDetailsContext = { type, id };
@@ -1288,7 +933,7 @@ function openDetailsModal(type, id) {
       </div>`
     : `
       <div class="grid sm:grid-cols-2 gap-3">
-        <div class="details-meta-row"><i data-lucide="calendar-days" class="w-4 h-4 text-blue-700 shrink-0"></i><span>${item.day} ${item.month[currentLang]} 2026</span></div>
+        <div class="details-meta-row"><i data-lucide="calendar-days" class="w-4 h-4 text-blue-700 shrink-0"></i><span>${item.day} ${item.month[currentLang]}</span></div>
         <div class="details-meta-row"><i data-lucide="clock" class="w-4 h-4 text-blue-700 shrink-0"></i><span>${t.detailsTimeLabel}: <strong>${item.time[currentLang]}</strong></span></div>
         <div class="details-meta-row sm:col-span-2"><i data-lucide="map-pin" class="w-4 h-4 text-blue-700 shrink-0"></i><span>${t.detailsLocationLabel}: <strong>${item.location[currentLang]}</strong></span></div>
         <div class="details-meta-row sm:col-span-2"><i data-lucide="user-check" class="w-4 h-4 text-emerald-700 shrink-0"></i><span>${t.eventSpeakerLabel} <strong>${item.speaker[currentLang]}</strong></span></div>
@@ -1343,6 +988,7 @@ function renderStartups() {
 
   container.innerHTML = "";
 
+  if (renderContentState(container, 'startups', STARTUPS_DATA.length)) return;
   STARTUPS_DATA.forEach((st) => {
     const card = document.createElement("div");
     card.className = "glass-panel glass-panel-hover rounded-2xl p-6 sm:p-7 flex flex-col justify-between transition-all";
@@ -1396,7 +1042,7 @@ function renderStartups() {
 }
 
 function openStartupModal(id) {
-  const startup = STARTUPS_DATA.find((s) => s.id === id);
+  const startup = STARTUPS_DATA.find((s) => s.id === Number(id));
   if (!startup) return;
 
   const modal = document.getElementById("startup-modal");
@@ -1486,15 +1132,7 @@ function openStartupModal(id) {
         >
           ${translations[currentLang].modalCloseBtn}
         </button>
-        <a 
-          href="${startup.website}" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="btn-primary px-5 py-2.5 text-sm"
-        >
-          <span>${translations[currentLang].modalVisitWebsite}</span>
-          <i data-lucide="arrow-up-right" class="w-4 h-4 ml-1.5"></i>
-        </a>
+        ${startup.website ? `<a href="${startup.website}" target="_blank" rel="noopener noreferrer" class="btn-primary px-5 py-2.5 text-sm"><span>${translations[currentLang].modalVisitWebsite}</span><i data-lucide="arrow-up-right" class="w-4 h-4 ml-1.5"></i></a>` : ''}
       </div>
     </div>
   `;
@@ -1530,6 +1168,7 @@ function renderEvents() {
 
   container.innerHTML = "";
 
+  if (renderContentState(container, 'events', EVENTS_DATA.length)) return;
   EVENTS_DATA.forEach((ev) => {
     const card = document.createElement("div");
     card.className = "glass-panel glass-panel-hover rounded-2xl p-6 sm:p-7 flex flex-col justify-between transition-all";
@@ -1606,6 +1245,7 @@ function renderNews() {
 
   container.innerHTML = "";
 
+  if (renderContentState(container, 'news', NEWS_DATA.length)) return;
   NEWS_DATA.forEach((item) => {
     const card = document.createElement("div");
     card.className = "glass-panel glass-panel-hover rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer transition-all";
@@ -1613,13 +1253,8 @@ function renderNews() {
 
     card.innerHTML = `
       <div>
-        <div class="relative h-48 w-full overflow-hidden bg-white">
-          <img 
-            src="${item.image}" 
-            alt="${item.title[currentLang]}" 
-            class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105"
-            loading="lazy"
-          />
+        <div class="relative h-48 w-full overflow-hidden bg-slate-100">
+          ${item.image ? `<img src="${item.image}" alt="${item.title[currentLang]}" class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105" loading="lazy" />` : ''}
           <!-- Linear Dark Gradient Mask for Crisp Text Contrast -->
           <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent pointer-events-none"></div>
           
@@ -1658,7 +1293,7 @@ function renderNews() {
 }
 
 function openNewsLightbox(id) {
-  const item = NEWS_DATA.find((n) => n.id === id);
+  const item = NEWS_DATA.find((n) => n.id === Number(id));
   if (!item) return;
 
   const lightbox = document.getElementById("news-lightbox");
@@ -1666,12 +1301,8 @@ function openNewsLightbox(id) {
   if (!lightbox || !content) return;
 
   content.innerHTML = `
-    <div class="relative w-full h-64 sm:h-80 overflow-hidden bg-white">
-      <img 
-        src="${item.image}" 
-        alt="${item.title[currentLang]}" 
-        class="w-full h-full object-cover object-center" 
-      />
+    <div class="relative w-full h-64 sm:h-80 overflow-hidden bg-slate-100">
+      ${item.image ? `<img src="${item.image}" alt="${item.title[currentLang]}" class="w-full h-full object-cover object-center" />` : ''}
       <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
       
       <button 
@@ -1748,6 +1379,7 @@ function renderMentors(filter = "all") {
 
   container.innerHTML = "";
 
+  if (renderContentState(container, 'mentors', filtered.length)) return;
   filtered.forEach((m) => {
     const card = document.createElement("div");
     card.className = "glass-panel glass-panel-hover rounded-2xl p-6 text-center flex flex-col items-center justify-between transition-all";
@@ -1765,11 +1397,7 @@ function renderMentors(filter = "all") {
       <div class="flex flex-col items-center w-full">
         <!-- Uniform rounded-2xl glass frame styling for profile photo container -->
         <div class="relative w-24 h-24 mb-4 rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg p-1 bg-white backdrop-blur-sm">
-          <img 
-            src="${m.avatar}" 
-            alt="${m.name}" 
-            class="w-full h-full object-cover object-center rounded-xl" 
-          />
+          ${m.avatar ? `<img src="${m.avatar}" alt="${m.name}" class="w-full h-full object-cover object-center rounded-xl" />` : `<span class="flex h-full w-full items-center justify-center text-2xl font-bold text-blue-700">${m.name.charAt(0)}</span>`}
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent pointer-events-none"></div>
         </div>
 
@@ -1863,7 +1491,7 @@ function openModal(type = "idea", data = null, preserveValues = false) {
 
   if (type === "program") {
     // Form 2: Program Application
-    const selectedProgramObj = PROGRAMS_DATA.find((p) => p.id === data);
+    const selectedProgramObj = PROGRAMS_DATA.find((p) => p.id === Number(data));
     const prefillTitle = selectedProgramObj ? selectedProgramObj.title[currentLang] : (typeof data === "string" ? data : "");
 
     headerIcon.innerHTML = `<i data-lucide="graduation-cap" class="w-5 h-5 text-blue-700"></i>`;
@@ -1953,7 +1581,7 @@ function openModal(type = "idea", data = null, preserveValues = false) {
 
   } else if (type === "event") {
     // Form 3: Event Registration
-    const selectedEventObj = EVENTS_DATA.find((e) => e.id === data);
+    const selectedEventObj = EVENTS_DATA.find((e) => e.id === Number(data));
     const eventTitle = selectedEventObj ? selectedEventObj.title[currentLang] : (typeof data === "string" ? data : "");
 
     headerIcon.innerHTML = `<i data-lucide="calendar" class="w-5 h-5 text-amber-700"></i>`;
@@ -2354,6 +1982,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderEvents();
   renderNews();
   renderMentors("all");
+  renderPartners();
+  contentTypes.forEach((type) => loadPublicContent(type));
 
   // 2. Initialize observers and features
   initStatsCounter();

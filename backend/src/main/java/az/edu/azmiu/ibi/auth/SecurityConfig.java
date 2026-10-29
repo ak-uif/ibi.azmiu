@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .securityContext(context -> context.securityContextRepository(contextRepository))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/api/health", "/api/auth/csrf").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/health", "/api/auth/csrf", "/api/public/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
