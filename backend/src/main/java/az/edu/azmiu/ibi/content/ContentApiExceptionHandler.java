@@ -3,6 +3,8 @@ package az.edu.azmiu.ibi.content;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,6 +23,22 @@ public class ContentApiExceptionHandler {
     ResponseEntity<ApiError> invalid(InvalidContentException exception) {
         return ResponseEntity.badRequest()
                 .body(new ApiError("invalid_request", exception.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidUploadException.class)
+    ResponseEntity<ApiError> invalidUpload(InvalidUploadException exception) {
+        return ResponseEntity.badRequest().body(new ApiError("invalid_upload", exception.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    ResponseEntity<ApiError> tooLarge(MaxUploadSizeExceededException exception) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(new ApiError("file_too_large", "CV must be 5 MB or smaller"));
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    ResponseEntity<ApiError> missingPart(MissingServletRequestPartException exception) {
+        return ResponseEntity.badRequest().body(new ApiError("invalid_upload", "Application details are missing"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

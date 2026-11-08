@@ -23,6 +23,9 @@ public abstract class BaseEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    public Long getId() { return id; }
+    public Instant getCreatedAt() { return createdAt; }
+
     @PrePersist
     void onCreate() {
         createdAt = Instant.now();

@@ -61,7 +61,7 @@ class IbiBackendApplicationTests {
                 "programs", "events", "news", "mentors", "startups", "partners",
                 "program_applications", "event_registrations", "mentor_applications", "startup_applications",
                 "admin_users")));
-        assertEquals("2", flyway.info().current().getVersion().getVersion());
+        assertEquals("3", flyway.info().current().getVersion().getVersion());
 
         Set<Class<?>> entities = new HashSet<>();
         entityManagerFactory.getMetamodel().getEntities()

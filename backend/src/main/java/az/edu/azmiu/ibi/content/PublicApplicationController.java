@@ -8,11 +8,14 @@ import az.edu.azmiu.ibi.model.StartupApplication;
 import jakarta.validation.Valid;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/public/applications")
@@ -21,13 +24,15 @@ public class PublicApplicationController {
     private final EventRegistrationRepository events;
     private final MentorApplicationRepository mentors;
     private final StartupApplicationRepository startups;
+    private final MentorCvStorage cvStorage;
 
     public PublicApplicationController(ProgramApplicationRepository programs, EventRegistrationRepository events,
-            MentorApplicationRepository mentors, StartupApplicationRepository startups) {
+            MentorApplicationRepository mentors, StartupApplicationRepository startups, MentorCvStorage cvStorage) {
         this.programs = programs;
         this.events = events;
         this.mentors = mentors;
         this.startups = startups;
+        this.cvStorage = cvStorage;
     }
 
     @PostMapping("/programs")
@@ -48,15 +53,25 @@ public class PublicApplicationController {
         return saved(events, entity);
     }
 
-    @PostMapping("/mentors")
+    @PostMapping(value = "/mentors", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public SubmissionResponse mentor(@Valid @RequestBody ApplicationRequests.Mentor request) {
-        MentorApplication entity = common(new MentorApplication(), request.fullName(), request.email(), request.phone());
-        entity.setCompanyRole(request.companyRole().trim());
-        entity.setExpertise(request.expertise());
-        entity.setLinkedin(request.linkedin().trim());
-        entity.setBio(request.bio().trim());
-        return saved(mentors, entity);
+        return saved(mentors, mentorEntity(request));
+    }
+
+    @PostMapping(value = "/mentors", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public SubmissionResponse mentorMultipart(@Valid @RequestPart("application") ApplicationRequests.Mentor request,
+            @RequestPart(value = "cv", required = false) MultipartFile cv) {
+        MentorApplication entity = mentorEntity(request);
+        String key = cv == null ? null : cvStorage.store(cv);
+        entity.setCvStorageKey(key);
+        try {
+            return saved(mentors, entity);
+        } catch (RuntimeException exception) {
+            cvStorage.delete(key);
+            throw exception;
+        }
     }
 
     @PostMapping("/startups")
@@ -73,6 +88,15 @@ public class PublicApplicationController {
         entity.setFullName(fullName.trim());
         entity.setEmail(email.trim());
         entity.setPhone(phone.trim());
+        return entity;
+    }
+
+    private static MentorApplication mentorEntity(ApplicationRequests.Mentor request) {
+        MentorApplication entity = common(new MentorApplication(), request.fullName(), request.email(), request.phone());
+        entity.setCompanyRole(request.companyRole().trim());
+        entity.setExpertise(request.expertise());
+        entity.setLinkedin(request.linkedin().trim());
+        entity.setBio(request.bio().trim());
         return entity;
     }
 

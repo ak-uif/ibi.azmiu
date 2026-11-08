@@ -192,6 +192,11 @@ const translations = {
     btnSubmitting: "Göndərilir...",
     formErrorValidation: "Məlumatları yoxlayın:",
     formErrorServer: "Müraciət göndərilmədi. Bir az sonra yenidən cəhd edin.",
+    formErrorCvType: "CV faylı boş, zədələnmiş və ya uyğun olmayan formatdadır. PDF, DOC və ya DOCX seçin.",
+    formErrorCvSize: "CV faylı 5 MB-dan böyük olmamalıdır.",
+    fieldCv: "CV (istəyə bağlı, PDF/DOC/DOCX, maksimum 5 MB)",
+    clearCv: "CV-ni sil",
+    selectedCv: "Seçilmiş fayl:",
     btnSuccessClose: "Tamamdır",
 
     // Form 1: Idea Submission
@@ -431,6 +436,11 @@ const translations = {
     btnSubmitting: "Submitting...",
     formErrorValidation: "Please check your details:",
     formErrorServer: "Your application was not sent. Please try again later.",
+    formErrorCvType: "The CV is empty, damaged or unsupported. Choose a PDF, DOC or DOCX file.",
+    formErrorCvSize: "The CV must be 5 MB or smaller.",
+    fieldCv: "CV (optional, PDF/DOC/DOCX, maximum 5 MB)",
+    clearCv: "Remove CV",
+    selectedCv: "Selected file:",
     btnSuccessClose: "Done",
 
     // Form 1: Idea Submission
@@ -1461,6 +1471,7 @@ function renderMentors(filter = "all") {
 
 let currentActiveModalType = null;
 let currentActiveModalData = null;
+let selectedMentorCv = null;
 
 /**
  * openModal(type, data)
@@ -1471,6 +1482,7 @@ let currentActiveModalData = null;
  * - 'mentor': Mentor Network
  */
 function openModal(type = "idea", data = null, preserveValues = false) {
+  if (!preserveValues) selectedMentorCv = null;
   currentActiveModalType = type;
   currentActiveModalData = data;
 
@@ -1487,6 +1499,9 @@ function openModal(type = "idea", data = null, preserveValues = false) {
   const preservedValues = preserveValues && existingForm instanceof HTMLFormElement
     ? new FormData(existingForm)
     : null;
+  if (preserveValues && type === 'mentor') {
+    selectedMentorCv = existingForm?.elements.namedItem('cv')?.files?.[0] || selectedMentorCv;
+  }
 
   // Reset success state
   successState.classList.add("hidden");
@@ -1768,6 +1783,16 @@ function openModal(type = "idea", data = null, preserveValues = false) {
           ></textarea>
         </div>
 
+        <div>
+          <label for="mentor-cv" class="block text-xs font-semibold text-slate-600 mb-1">${t.fieldCv}</label>
+          <input id="mentor-cv" type="file" name="cv" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            class="w-full bg-white border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-2.5" />
+          <div class="mt-2 flex items-center gap-3 text-xs text-slate-600" id="mentor-cv-selection" hidden>
+            <span>${t.selectedCv} <span id="mentor-cv-name"></span></span>
+            <button type="button" id="mentor-cv-clear" class="text-blue-700 underline">${t.clearCv}</button>
+          </div>
+        </div>
+
         <div class="pt-2 flex flex-col sm:flex-row items-center justify-end gap-3">
           <button 
             type="button" 
@@ -1890,8 +1915,22 @@ function openModal(type = "idea", data = null, preserveValues = false) {
     const activeForm = document.getElementById("modal-active-form");
     preservedValues.forEach((value, name) => {
       const field = activeForm?.elements.namedItem(name);
-      if (field && "value" in field) field.value = value;
+      if (field && field.type !== 'file' && "value" in field) field.value = value;
     });
+  }
+  if (type === 'mentor') {
+    const cvInput = container.querySelector('#mentor-cv');
+    const refreshCv = () => {
+      container.querySelector('#mentor-cv-selection').hidden = !selectedMentorCv;
+      container.querySelector('#mentor-cv-name').textContent = selectedMentorCv?.name || '';
+    };
+    cvInput.addEventListener('change', () => { selectedMentorCv = cvInput.files[0] || null; refreshCv(); });
+    container.querySelector('#mentor-cv-clear').addEventListener('click', () => {
+      selectedMentorCv = null;
+      cvInput.value = '';
+      refreshCv();
+    });
+    refreshCv();
   }
 
   modal.classList.remove("hidden");
@@ -1937,7 +1976,12 @@ async function handleModalSubmit(e, formType) {
   submitBtn.innerHTML = `<span>${t.btnSubmitting}</span>`;
 
   try {
-    await applicationSubmitter.submit(formType, new FormData(form));
+    const values = new FormData(form);
+    if (formType === 'mentor') {
+      values.delete('cv');
+      if (selectedMentorCv) values.set('cv', selectedMentorCv);
+    }
+    await applicationSubmitter.submit(formType, values);
     if (!form.isConnected || currentActiveModalType !== formType) return;
 
     // Show success only after the API confirms persistence.
@@ -1959,9 +2003,11 @@ async function handleModalSubmit(e, formType) {
     successState.classList.remove("hidden");
   } catch (error) {
     if (!form.isConnected || error.code === 'in_progress') return;
-    const message = error.code === 'validation_failed'
-      ? `${translations[currentLang].formErrorValidation} ${error.message}`
-      : translations[currentLang].formErrorServer;
+    const currentText = translations[currentLang];
+    const message = error.code === 'file_too_large' ? currentText.formErrorCvSize
+      : error.code === 'invalid_upload' ? currentText.formErrorCvType
+      : error.code === 'validation_failed' ? `${currentText.formErrorValidation} ${error.message}`
+      : currentText.formErrorServer;
     const alert = document.createElement('p');
     alert.dataset.submitError = '';
     alert.setAttribute('role', 'alert');

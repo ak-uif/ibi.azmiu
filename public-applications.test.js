@@ -19,8 +19,40 @@ test('all four forms send every field to their matching endpoint', async () => {
     assert.deepEqual(await submitter.submit(type, Object.entries(payload)), { status: 'submitted' });
     assert.equal(call.url, `http://localhost:8080/api/public/applications/${path}`);
     assert.equal(call.options.method, 'POST');
-    assert.deepEqual(JSON.parse(call.options.body), payload);
+    if (type === 'mentor') {
+      assert.ok(call.options.body instanceof FormData);
+      assert.equal(call.options.headers['Content-Type'], undefined);
+      assert.deepEqual(JSON.parse(await call.options.body.get('application').text()), payload);
+      assert.equal(call.options.body.has('cv'), false);
+    } else {
+      assert.deepEqual(JSON.parse(call.options.body), payload);
+    }
   }
+});
+
+test('mentor CV is attached only when selected and a confirmed save is required', async () => {
+  const cv = new File(['%PDF-1.4\n%%EOF'], 'resume.pdf', { type: 'application/pdf' });
+  let body;
+  const submitter = createApplicationSubmitter('', async (_, options) => {
+    body = options.body;
+    return { ok: true, status: 201, json: async () => ({ status: 'submitted' }) };
+  });
+  await submitter.submit('mentor', [['fullName', 'A'], ['cv', cv]]);
+  assert.equal(body.get('cv').name, 'resume.pdf');
+  assert.equal((await body.get('cv').text()), await cv.text());
+  assert.deepEqual(JSON.parse(await body.get('application').text()), { fullName: 'A' });
+});
+
+test('oversized CV is rejected before request and backend upload errors propagate', async () => {
+  let calls = 0;
+  const submitter = createApplicationSubmitter('', async () => { calls++; return { ok: false, status: 400,
+    json: async () => ({ code: 'invalid_upload', message: 'CV file content is invalid' }) }; });
+  const large = new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'large.pdf', { type: 'application/pdf' });
+  await assert.rejects(submitter.submit('mentor', [['cv', large]]), { code: 'file_too_large' });
+  assert.equal(calls, 0);
+  const malformed = new File(['bad'], 'bad.pdf', { type: 'application/pdf' });
+  await assert.rejects(submitter.submit('mentor', [['cv', malformed]]), { code: 'invalid_upload' });
+  assert.equal(calls, 1);
 });
 
 test('success requires a confirmed 201 response', async () => {

@@ -37,3 +37,18 @@ test('a CSRF rejection checks whether the session expired', async () => {
     assert.equal(expired, 1);
   } finally { globalThis.fetch = originalFetch; globalThis.window = originalWindow; }
 });
+
+test('CV download uses the authenticated session and returns a blob', async () => {
+  const originalFetch = globalThis.fetch;
+  let options;
+  const pdf = new Blob(['%PDF-test'], { type: 'application/pdf' });
+  globalThis.fetch = async (_, request) => {
+    options = request;
+    return { ok: true, status: 200, blob: async () => pdf };
+  };
+  try {
+    assert.equal(await api.download('/api/admin/mentor-applications/7/cv'), pdf);
+    assert.equal(options.credentials, 'include');
+    assert.equal(options.cache, 'no-store');
+  } finally { globalThis.fetch = originalFetch; }
+});

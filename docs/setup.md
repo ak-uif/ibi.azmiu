@@ -21,10 +21,11 @@ Repo kökündə:
 npm ci
 npm run dev
 npm run test:admin
+npm run test:public
 npm run build
 ```
 
-Vite terminalda local ünvanı göstərir. `/admin` real backend login-inə qoşulur. Admin panelində proqram, tədbir, xəbər, mentor, startap və partnyor qeydləri lokal backend API-sindən idarə olunur. Public sayt həmin altı bölməni `/api/public/*` ünvanlarından oxuyur. Proqramlarda `open`, `active`, `soon` statusları; qalan beş bölmədə yalnız `published=true` qeydləri görünür. `draft`, `archived` və yayımlanmamış qeydlər public API-yə düşmür. Müraciət formaları hələ database-ə qoşulmayıb.
+Vite terminalda local ünvanı göstərir. `/admin` real backend login-inə qoşulur. Admin panelində proqram, tədbir, xəbər, mentor, startap və partnyor qeydləri lokal backend API-sindən idarə olunur. Public sayt həmin altı bölməni `/api/public/*` ünvanlarından oxuyur. Proqramlarda `open`, `active`, `soon` statusları; qalan beş bölmədə yalnız `published=true` qeydləri görünür. `draft`, `archived` və yayımlanmamış qeydlər public API-yə düşmür. Dörd public müraciət forması database-ə yazılır; mentor CV-si istəyə bağlıdır.
 
 Lokal frontend başlamazdan əvvəl eyni terminalda `$env:VITE_API_BASE_URL='http://localhost:8080'` təyin edin. Bu public URL-dir, şifrə deyil; alternativ olaraq ignore olunan `.env` faylında saxlayın. Backend 8080 portunda işləməlidir. API boşdursa, bölmələr boş vəziyyət göstərir; backend işləmirsə, xəta mesajı görünür. `npm run test:public` public UI-nin yüklənmə, boş və xəta vəziyyətlərini yoxlayır.
 
@@ -45,7 +46,7 @@ Get-Content ..\.env | ForEach-Object {
 Invoke-RestMethod http://localhost:8080/api/health
 ```
 
-Backend başlananda Flyway `V1` və `V2` migration-larını tətbiq edir; Hibernate entity-lərin sxemə uyğunluğunu yoxlayır. PostgreSQL serveri işləməli, göstərilən istifadəçinin database-də cədvəl yaratmaq icazəsi olmalıdır. Health cavabı `{"status":"ok","service":"ibi-backend"}`-dir. Local frontend origin-i dəyişərsə, `CORS_ALLOWED_ORIGINS` dəyişəninə onu ayrıca əlavə edin.
+Backend başlananda Flyway `V1`, `V2` və `V3` migration-larını tətbiq edir; Hibernate entity-lərin sxemə uyğunluğunu yoxlayır. PostgreSQL serveri işləməli, göstərilən istifadəçinin database-də cədvəl yaratmaq icazəsi olmalıdır. Health cavabı `{"status":"ok","service":"ibi-backend"}`-dir. Local frontend origin-i dəyişərsə, `CORS_ALLOWED_ORIGINS` dəyişəninə onu ayrıca əlavə edin.
 
 ## Tək lokal nümunə proqram
 
@@ -60,3 +61,7 @@ Remove-Item Env:PGPASSWORD
 `psql.exe` yolu PostgreSQL versiyanıza görə fərqlənə bilər. Skript təkrar işləndikdə eyni başlıqlı ikinci proqramı yaratmır. Production-da bu skripti işlətməyin; tətbiq onu avtomatik icra etmir. Admin panelində test üçün qaralama proqram və `published=false` xəbər yaradıb `/api/public/programs` və `/api/public/news` cavablarında görünmədiyini yoxlayın. Admin panelində dəyişiklikləri geri qaytarın və ya test üçün ayrı database istifadə edin.
 
 Real şifrə, admin şifrəsi və digər secret-ləri `.env.example`-ə, sənədlərə və GitHub-a yazmayın. Lokal backend (`localhost:8080`) Vercel-dəki public frontend üçün əlçatan deyil; canlı admin girişini işlətmək üçün backend ayrıca yerləşdirilməli və API/CORS ünvanları uyğun konfiqurasiya olunmalıdır.
+
+## Mentor CV faylları
+
+Mentor müraciətində PDF, DOC və DOCX CV faylı istəyə bağlıdır (maksimum 5 MB). Backend faylı public saytın xaricində, standart olaraq istifadəçi profilində `.ibi-azmiu/mentor-cvs` qovluğunda saxlayır. İstəsəniz, `CV_STORAGE_DIR` environment variable-ını repo və web root xaricindəki private qovluğa yönəldin. Git-ə CV və `.env` göndərməyin. Admin panelində **Müraciətlər → Mentorlar** bölməsində müraciətə baxıb CV-ni autentifikasiya tələb edən düymə ilə endirin.

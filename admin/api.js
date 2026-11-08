@@ -8,9 +8,10 @@ export class ApiError extends Error {
 }
 
 async function request(path, options = {}) {
+  const { asBlob = false, ...fetchOptions } = options;
   let response;
   try {
-    response = await fetch(`${baseUrl}${path}`, { credentials: 'include', cache: 'no-store', ...options });
+    response = await fetch(`${baseUrl}${path}`, { credentials: 'include', cache: 'no-store', ...fetchOptions });
   } catch {
     throw new ApiError('Serverə qoşulmaq mümkün olmadı. Backend-i yoxlayın.', 0);
   }
@@ -32,11 +33,12 @@ async function request(path, options = {}) {
     } catch { /* Some errors have no JSON body. */ }
     throw new ApiError(message, response.status);
   }
-  return response.status === 204 ? null : response.json();
+  return response.status === 204 ? null : asBlob ? response.blob() : response.json();
 }
 
 export const api = {
   get: (path) => request(path),
+  download: (path) => request(path, { asBlob: true }),
   async mutate(path, method, body) {
     const { token } = await request('/api/auth/csrf');
     return request(path, {

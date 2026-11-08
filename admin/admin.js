@@ -43,7 +43,8 @@ const icons = {
 };
 const icon = (name, size = 20) => `<svg aria-hidden="true" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`;
 
-const state = { tab: 0, menuOpen: false, dashboard: null, dashboardLoading: false, dashboardError: '' };
+const state = { tab: 0, menuOpen: false, dashboard: null, dashboardLoading: false, dashboardError: '',
+  mentorApplications: null, mentorDetail: null, mentorLoading: false, mentorError: '' };
 const contentPanel = new ContentPanel(() => { if (contentConfig[route()]) render(); });
 const route = () => {
   const match = location.pathname.match(/^\/admin\/([^/]+)\/?$/);
@@ -155,7 +156,54 @@ async function loadDashboard() {
 
 function sectionContent(slug) {
   if (contentConfig[slug]) return contentPanel.markup(slug);
-  return `${slug === 'applications' ? `<div class="admin-tabs" role="tablist" aria-label="Müraciət növü">${applicationTabs.map((tab, index) => `<button type="button" role="tab" aria-selected="${state.tab === index}" class="${state.tab === index ? 'active' : ''}" data-tab="${index}">${tab}</button>`).join('')}</div>` : ''}<div class="admin-card admin-section-card"><div class="admin-state"><h2>Bu bölmə hələ API-yə qoşulmayıb</h2><p>Məlumatlar hazır olduqda burada görünəcək.</p></div></div>`;
+  const tabs = slug === 'applications' ? `<div class="admin-tabs" role="tablist" aria-label="Müraciət növü">${applicationTabs.map((tab, index) => `<button type="button" role="tab" aria-selected="${state.tab === index}" class="${state.tab === index ? 'active' : ''}" data-tab="${index}">${tab}</button>`).join('')}</div>` : '';
+  if (slug === 'applications' && state.tab === 3) return tabs + mentorCvContent();
+  return `${tabs}<div class="admin-card admin-section-card"><div class="admin-state"><h2>Bu bölmə hələ API-yə qoşulmayıb</h2><p>Məlumatlar hazır olduqda burada görünəcək.</p></div></div>`;
+}
+
+function mentorCvContent() {
+  if (state.mentorLoading) return '<div class="admin-card admin-state" role="status"><span class="admin-spinner"></span><p>Mentor müraciətləri yüklənir...</p></div>';
+  if (state.mentorError) return `<div class="admin-card admin-state" role="alert"><p>${escapeHtml(state.mentorError)}</p><button type="button" class="admin-outline-button" id="mentor-retry">Yenidən yoxla</button></div>`;
+  const rows = state.mentorApplications || [];
+  const detail = state.mentorDetail;
+  const detailMarkup = detail ? `<section class="admin-card admin-section-card" aria-label="Mentor müraciəti"><h2>${escapeHtml(detail.fullName)}</h2><p>${escapeHtml(detail.email)} · ${escapeHtml(detail.phone)}</p><p>${escapeHtml(detail.companyRole)} · ${escapeHtml(detail.expertise)}</p><p>${escapeHtml(detail.bio)}</p>${detail.hasCv ? `<button type="button" class="btn-primary" data-cv-id="${detail.id}">CV-ni endir</button>` : '<p>CV əlavə edilməyib.</p>'}</section>` : '';
+  return `<div class="admin-card admin-section-card"><h2>Mentor müraciətləri</h2>${rows.length ? rows.map((row) => `<div class="admin-list-row"><div><strong>${escapeHtml(row.fullName)}</strong><small>${row.hasCv ? 'CV əlavə olunub' : 'CV yoxdur'}</small></div><button type="button" class="admin-outline-button" data-mentor-id="${row.id}">Ətraflı bax</button></div>`).join('') : '<p class="admin-empty-note">Hələ mentor müraciəti yoxdur.</p>'}</div>${detailMarkup}`;
+}
+
+async function loadMentorApplications() {
+  state.mentorLoading = true;
+  state.mentorError = '';
+  render();
+  try { state.mentorApplications = await api.get('/api/admin/mentor-applications'); }
+  catch (error) { state.mentorError = error.message; }
+  finally { state.mentorLoading = false; if (route() === 'applications') render(); }
+}
+
+async function loadMentorDetail(id) {
+  state.mentorLoading = true;
+  render();
+  try { state.mentorDetail = await api.get(`/api/admin/mentor-applications/${id}`); }
+  catch (error) { state.mentorError = error.message; }
+  finally { state.mentorLoading = false; if (route() === 'applications') render(); }
+}
+
+async function downloadMentorCv(id, button) {
+  button.disabled = true;
+  try {
+    const blob = await api.download(`/api/admin/mentor-applications/${id}/cv`);
+    const extension = blob.type === 'application/pdf' ? 'pdf' : blob.type === 'application/msword' ? 'doc' : 'docx';
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mentor-cv.${extension}`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    state.mentorError = error.message;
+    render();
+  } finally { button.disabled = false; }
 }
 
 function renderPanel(slug) {
@@ -213,6 +261,11 @@ function renderPanel(slug) {
       state.tab = Number(tab.dataset.tab);
       render();
     }));
+    if (slug === 'applications') {
+      document.querySelector('#mentor-retry')?.addEventListener('click', loadMentorApplications);
+      document.querySelectorAll('[data-mentor-id]').forEach((button) => button.addEventListener('click', () => loadMentorDetail(Number(button.dataset.mentorId))));
+      document.querySelectorAll('[data-cv-id]').forEach((button) => button.addEventListener('click', () => downloadMentorCv(Number(button.dataset.cvId), button)));
+    }
   }
 }
 
@@ -240,6 +293,7 @@ function render() {
     renderPanel(slug);
     if (contentConfig[slug] && contentPanel.slug !== slug) contentPanel.load(slug, true);
     if (slug === 'dashboard' && !state.dashboard && !state.dashboardLoading && !state.dashboardError) loadDashboard();
+    if (slug === 'applications' && state.tab === 3 && !state.mentorApplications && !state.mentorLoading && !state.mentorError) loadMentorApplications();
   }
 }
 
