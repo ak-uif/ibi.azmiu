@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import az.edu.azmiu.ibi.activity.AdminActivityService;
 import az.edu.azmiu.ibi.model.ApplicationEntity;
 import az.edu.azmiu.ibi.model.EventRegistration;
 import az.edu.azmiu.ibi.model.MentorApplication;
@@ -51,15 +52,17 @@ public class AdminApplicationService {
     private final EventRegistrationRepository events;
     private final MentorApplicationRepository mentors;
     private final StartupApplicationRepository startups;
+    private final AdminActivityService activity;
 
     public AdminApplicationService(NamedParameterJdbcTemplate jdbc, ProgramApplicationRepository programs,
             EventRegistrationRepository events, MentorApplicationRepository mentors,
-            StartupApplicationRepository startups) {
+            StartupApplicationRepository startups, AdminActivityService activity) {
         this.jdbc = jdbc;
         this.programs = programs;
         this.events = events;
         this.mentors = mentors;
         this.startups = startups;
+        this.activity = activity;
     }
 
     public Query filters(String type, String status, String search, String sort, String page, String size) {
@@ -143,6 +146,7 @@ public class AdminApplicationService {
     public Map<String, Object> updateStatus(String type, Long id, String status) {
         if (status == null || !STATUSES.contains(status)) throw new InvalidContentException("Invalid application status");
         ApplicationEntity entity = find(type, id);
+        if (status.equals(entity.getStatus())) return detail(type, id);
         entity.setStatus(status);
         switch (type) {
             case "program" -> programs.saveAndFlush((ProgramApplication) entity);
@@ -151,6 +155,7 @@ public class AdminApplicationService {
             case "startup" -> startups.saveAndFlush((StartupApplication) entity);
             default -> throw new InvalidContentException("Invalid application type");
         }
+        activity.recordChange("APPLICATION_STATUS_CHANGED", applicationType(type), id, status);
         return detail(type, id);
     }
 
@@ -197,6 +202,14 @@ public class AdminApplicationService {
             case "event" -> events.findById(id).orElseThrow(() -> new RecordNotFoundException("Application"));
             case "mentor" -> mentors.findById(id).orElseThrow(() -> new RecordNotFoundException("Application"));
             case "startup" -> startups.findById(id).orElseThrow(() -> new RecordNotFoundException("Application"));
+            default -> throw new InvalidContentException("Invalid application type");
+        };
+    }
+
+    public static String applicationType(String type) {
+        return switch (type) {
+            case "program", "mentor", "startup" -> type + "_application";
+            case "event" -> "event_registration";
             default -> throw new InvalidContentException("Invalid application type");
         };
     }

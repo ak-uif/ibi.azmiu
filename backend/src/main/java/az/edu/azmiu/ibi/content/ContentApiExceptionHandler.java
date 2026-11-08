@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-@RestControllerAdvice(basePackages = "az.edu.azmiu.ibi.content")
+@RestControllerAdvice(basePackages = {"az.edu.azmiu.ibi.content", "az.edu.azmiu.ibi.activity"})
 public class ContentApiExceptionHandler {
 
     @ExceptionHandler(RecordNotFoundException.class)

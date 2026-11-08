@@ -3,6 +3,7 @@ package az.edu.azmiu.ibi.content;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import az.edu.azmiu.ibi.activity.AdminActivityService;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -20,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/applications")
 public class AdminApplicationController {
     private final AdminApplicationService service;
+    private final AdminActivityService activity;
 
-    public AdminApplicationController(AdminApplicationService service) {
+    public AdminApplicationController(AdminApplicationService service, AdminActivityService activity) {
         this.service = service;
+        this.activity = activity;
     }
 
     @GetMapping
@@ -43,6 +46,7 @@ public class AdminApplicationController {
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "newest") String sort) {
         String csv = service.csv(service.filters(type, status, search, sort, "0", "20"));
+        activity.recordSuccess("APPLICATIONS_EXPORTED", "applications", null, null);
         return ResponseEntity.ok()
                 .contentType(new MediaType("text", "csv", StandardCharsets.UTF_8))
                 .cacheControl(CacheControl.noStore())
@@ -53,7 +57,9 @@ public class AdminApplicationController {
 
     @GetMapping("/{type}/{id}")
     public Map<String, Object> detail(@PathVariable String type, @PathVariable Long id) {
-        return service.detail(type, id);
+        Map<String, Object> result = service.detail(type, id);
+        activity.recordSuccess("APPLICATION_VIEWED", AdminApplicationService.applicationType(type), id, null);
+        return result;
     }
 
     @PatchMapping("/{type}/{id}/status")

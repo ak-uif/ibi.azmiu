@@ -3,6 +3,7 @@ package az.edu.azmiu.ibi.content;
 import java.time.Instant;
 import java.util.List;
 
+import az.edu.azmiu.ibi.activity.AdminActivityService;
 import az.edu.azmiu.ibi.model.MentorApplication;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ContentDisposition;
@@ -18,10 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminMentorApplicationController {
     private final MentorApplicationRepository repository;
     private final MentorCvStorage storage;
+    private final AdminActivityService activity;
 
-    public AdminMentorApplicationController(MentorApplicationRepository repository, MentorCvStorage storage) {
+    public AdminMentorApplicationController(MentorApplicationRepository repository, MentorCvStorage storage,
+            AdminActivityService activity) {
         this.repository = repository;
         this.storage = storage;
+        this.activity = activity;
     }
 
     @GetMapping
@@ -33,14 +37,17 @@ public class AdminMentorApplicationController {
     @GetMapping("/{id}")
     public Detail detail(@PathVariable Long id) {
         MentorApplication entity = find(id);
-        return new Detail(entity.getId(), entity.getFullName(), entity.getEmail(), entity.getPhone(),
+        Detail result = new Detail(entity.getId(), entity.getFullName(), entity.getEmail(), entity.getPhone(),
                 entity.getCompanyRole(), entity.getExpertise(), entity.getLinkedin(), entity.getBio(),
                 entity.getStatus(), entity.getCreatedAt(), entity.getCvStorageKey() != null);
+        activity.recordSuccess("APPLICATION_VIEWED", "mentor_application", id, null);
+        return result;
     }
 
     @GetMapping("/{id}/cv")
     public ResponseEntity<byte[]> download(@PathVariable Long id) {
         MentorCvStorage.StoredCv cv = storage.read(find(id).getCvStorageKey());
+        activity.recordSuccess("CV_DOWNLOADED", "mentor_application", id, null);
         return ResponseEntity.ok()
                 .contentType(cv.type())
                 .contentLength(cv.bytes().length)

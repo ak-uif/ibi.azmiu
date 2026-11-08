@@ -60,8 +60,8 @@ class IbiBackendApplicationTests {
         assertTrue(tables.containsAll(Set.of(
                 "programs", "events", "news", "mentors", "startups", "partners",
                 "program_applications", "event_registrations", "mentor_applications", "startup_applications",
-                "admin_users")));
-        assertEquals("3", flyway.info().current().getVersion().getVersion());
+                "admin_users", "admin_activity_log")));
+        assertEquals("4", flyway.info().current().getVersion().getVersion());
 
         Set<Class<?>> entities = new HashSet<>();
         entityManagerFactory.getMetamodel().getEntities()

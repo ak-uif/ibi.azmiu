@@ -2,6 +2,7 @@ package az.edu.azmiu.ibi.auth;
 
 import java.util.Map;
 
+import az.edu.azmiu.ibi.activity.AdminActivityService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -25,11 +26,13 @@ public class AuthController {
 
     private final AdminAuthenticationService authenticationService;
     private final SecurityContextRepository contextRepository;
+    private final AdminActivityService activity;
 
     public AuthController(AdminAuthenticationService authenticationService,
-            SecurityContextRepository contextRepository) {
+            SecurityContextRepository contextRepository, AdminActivityService activity) {
         this.authenticationService = authenticationService;
         this.contextRepository = contextRepository;
+        this.activity = activity;
     }
 
     @GetMapping("/csrf")
@@ -54,6 +57,13 @@ public class AuthController {
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);
             contextRepository.saveContext(context, request, response);
+            try {
+                activity.recordAuthentication(authentication.getName(), "LOGIN");
+            } catch (RuntimeException exception) {
+                SecurityContextHolder.clearContext();
+                session.invalidate();
+                throw exception;
+            }
             return ResponseEntity.ok(Map.of("username", authentication.getName()));
         } catch (AuthenticationException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -67,12 +77,13 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
-        SecurityContextHolder.clearContext();
+    public ResponseEntity<Void> logout(HttpServletRequest request, Authentication authentication) {
         HttpSession session = request.getSession(false);
         if (session != null) {
+            activity.recordAuthentication(authentication.getName(), "LOGOUT");
             session.invalidate();
         }
+        SecurityContextHolder.clearContext();
         return ResponseEntity.noContent().build();
     }
 

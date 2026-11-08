@@ -4,6 +4,7 @@ import { api } from './api.js';
 import { contentConfig } from './content-config.js';
 import { ContentPanel, escapeHtml } from './panel-content.js';
 import { ApplicationPanel } from './applications.js';
+import { ActivityPanel, actionLabel } from './activity.js';
 
 const app = document.querySelector('#admin-app');
 let authState = 'unknown';
@@ -46,6 +47,7 @@ const icon = (name, size = 20) => `<svg aria-hidden="true" width="${size}" heigh
 const state = { menuOpen: false, dashboard: null, dashboardLoading: false, dashboardError: '' };
 const contentPanel = new ContentPanel(() => { if (contentConfig[route()]) render(); });
 const applicationPanel = new ApplicationPanel(() => { if (route() === 'applications') render(); });
+const activityPanel = new ActivityPanel(() => { if (route() === 'activity') render(); });
 const route = () => {
   const match = location.pathname.match(/^\/admin\/([^/]+)\/?$/);
   return match && sections.some((item) => item.slug === match[1]) ? match[1] : null;
@@ -140,7 +142,7 @@ function dashboard() {
   return `<div class="admin-stats">${stats.map(([label, count, symbol, note]) => `<article class="admin-card admin-stat"><span class="admin-stat-icon">${icon(symbol)}</span><p>${label}</p><strong>${count}</strong><small>${note}</small></article>`).join('')}</div>
     <div class="admin-dashboard-grid"><section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">MƏZMUN</span><h2>Son proqramlar</h2></div><a href="/admin/programs" data-route="programs">Hamısına bax ${icon('arrow', 16)}</a></div>${data.programs.length ? data.programs.slice(-4).reverse().map((item) => `<div class="admin-list-row"><span class="admin-activity-icon">${icon('layers', 18)}</span><div><strong>${escapeHtml(item.titleAz)}</strong><small>${escapeHtml(item.status)}</small></div></div>`).join('') : '<p class="admin-empty-note">Hələ proqram yoxdur.</p>'}</section>
     <section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">MÜRACİƏTLƏR</span><h2>Son müraciətlər</h2></div><a href="/admin/applications" data-route="applications">Hamısına bax ${icon('arrow', 16)}</a></div>${data.applications.items.length ? data.applications.items.map((item) => `<div class="admin-list-row"><span class="admin-activity-icon">${icon('inbox', 18)}</span><div><strong>${escapeHtml(item.fullName)}</strong><small>${escapeHtml(item.title)} · ${escapeHtml(item.status)}</small></div></div>`).join('') : '<p class="admin-empty-note">Hələ müraciət yoxdur.</p>'}</section>
-    <section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">PANEL</span><h2>Son admin fəaliyyətləri</h2></div></div><p class="admin-empty-note">Fəaliyyət tarixçəsi API-si hələ yoxdur.</p></section></div>`;
+    <section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">PANEL</span><h2>Son admin fəaliyyətləri</h2></div><a href="/admin/activity" data-route="activity">Hamısına bax ${icon('arrow', 16)}</a></div>${data.activity.items.length ? data.activity.items.map((item) => `<div class="admin-list-row"><span class="admin-activity-icon">${icon('clock', 18)}</span><div><strong>${escapeHtml(actionLabel(item.action))}</strong><small>${escapeHtml(item.admin)} · ${escapeHtml(new Date(item.createdAt).toLocaleString('az-AZ'))}</small></div></div>`).join('') : '<p class="admin-empty-note">Hələ fəaliyyət yoxdur.</p>'}</section></div>`;
 }
 
 async function loadDashboard() {
@@ -148,12 +150,13 @@ async function loadDashboard() {
   state.dashboardError = '';
   render();
   try {
-    const [programs, events, applications, newApplications] = await Promise.all([
+    const [programs, events, applications, newApplications, activity] = await Promise.all([
       api.get('/api/admin/programs'), api.get('/api/admin/events'),
       api.get('/api/admin/applications?page=0&size=4'),
-      api.get('/api/admin/applications?status=NEW&page=0&size=1')
+      api.get('/api/admin/applications?status=NEW&page=0&size=1'),
+      api.get('/api/admin/activity?page=0&size=4')
     ]);
-    state.dashboard = { programs, events, applications, newApplications };
+    state.dashboard = { programs, events, applications, newApplications, activity };
   } catch (error) { state.dashboardError = error.message; }
   finally { state.dashboardLoading = false; if (route() === 'dashboard') render(); }
 }
@@ -161,6 +164,7 @@ async function loadDashboard() {
 function sectionContent(slug) {
   if (contentConfig[slug]) return contentPanel.markup(slug);
   if (slug === 'applications') return applicationPanel.markup();
+  if (slug === 'activity') return activityPanel.markup();
   return '<div class="admin-card admin-section-card"><div class="admin-state"><h2>Bu bölmə hələ API-yə qoşulmayıb</h2><p>Məlumatlar hazır olduqda burada görünəcək.</p></div></div>';
 }
 
@@ -178,7 +182,7 @@ function renderPanel(slug) {
       </aside>
       <div class="admin-main">
         <header class="admin-topbar"><button class="admin-menu-button" type="button" id="menu-button" aria-label="Menyunu aç" aria-expanded="${state.menuOpen}">${icon('menu')}</button><div class="admin-breadcrumb">İdarəetmə paneli <span>/</span> <strong>${item.label}</strong></div><span class="admin-topbar-badge">ADMIN</span></header>
-        <main class="admin-content"><div class="admin-page-head"><div><span class="admin-eyebrow">AZMİU İBİ / ADMIN</span><h1>${item.label}</h1><p>${slug === 'dashboard' ? 'İnkubatorun fəaliyyətinə ümumi baxış' : contentConfig[slug] || slug === 'applications' ? 'Database qeydlərini idarə edin' : 'Bölmə görünüşü'}</p></div><span class="admin-page-label">${contentConfig[slug] || slug === 'dashboard' || slug === 'applications' ? 'Lokal məlumatlar' : 'Hazırlanır'}</span></div>
+        <main class="admin-content"><div class="admin-page-head"><div><span class="admin-eyebrow">AZMİU İBİ / ADMIN</span><h1>${item.label}</h1><p>${slug === 'dashboard' ? 'İnkubatorun fəaliyyətinə ümumi baxış' : contentConfig[slug] || slug === 'applications' ? 'Database qeydlərini idarə edin' : slug === 'activity' ? 'Admin əməliyyatlarının tarixçəsi' : 'Bölmə görünüşü'}</p></div><span class="admin-page-label">${contentConfig[slug] || ['dashboard', 'applications', 'activity'].includes(slug) ? 'Lokal məlumatlar' : 'Hazırlanır'}</span></div>
           ${slug === 'dashboard' ? dashboard() : sectionContent(slug)}
         </main>
       </div>
@@ -194,6 +198,7 @@ function renderPanel(slug) {
       authState = 'guest';
       contentPanel.cancel();
       applicationPanel.cancel();
+      activityPanel.cancel();
       state.dashboard = null;
       state.dashboardError = '';
       state.menuOpen = false;
@@ -214,6 +219,7 @@ function renderPanel(slug) {
   }));
   if (contentConfig[slug]) contentPanel.bind(app);
   else if (slug === 'applications') applicationPanel.bind(app);
+  else if (slug === 'activity') activityPanel.bind(app);
   else if (slug === 'dashboard') {
     document.querySelector('#dashboard-retry')?.addEventListener('click', loadDashboard);
   }
@@ -224,6 +230,7 @@ function navigate(slug) {
   state.menuOpen = false;
   if (slug === 'dashboard') { state.dashboard = null; state.dashboardError = ''; }
   if (slug === 'applications') applicationPanel.loaded = false;
+  if (slug === 'activity') activityPanel.loaded = false;
   history.pushState({}, '', `/admin/${slug}`);
   render();
   window.scrollTo(0, 0);
@@ -244,6 +251,7 @@ function render() {
     if (contentConfig[slug] && contentPanel.slug !== slug) contentPanel.load(slug, true);
     if (slug === 'dashboard' && !state.dashboard && !state.dashboardLoading && !state.dashboardError) loadDashboard();
     if (slug === 'applications' && !applicationPanel.loaded) applicationPanel.load();
+    if (slug === 'activity' && !activityPanel.loaded) activityPanel.load();
   }
 }
 
@@ -252,6 +260,7 @@ window.addEventListener('admin-session-expired', () => {
   authState = 'guest';
   contentPanel.cancel();
   applicationPanel.cancel();
+  activityPanel.cancel();
   state.dashboard = null;
   state.dashboardError = '';
   history.replaceState({}, '', '/admin');

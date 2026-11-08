@@ -29,6 +29,8 @@ Vite terminalda local ünvanı göstərir. `/admin` real backend login-inə qoş
 
 `/admin/applications` səhifəsində admin dörd növ müraciəti axtara, növ və statusa görə süzə, tarixə görə sıralaya, səhifələyə, detallara baxa və statusu dəyişə bilər. CSV düyməsi seçilmiş filterlərin bütün nəticələrini endirir. Mentor CV-si yalnız admin sessiyası ilə ayrıca endirilir. Bu sorğular `/api/admin/applications` altında qorunur; statuslar `NEW`, `REVIEWING`, `ACCEPTED`, `REJECTED`, `ARCHIVED`-dir.
 
+`/admin/activity` səhifəsi uğurlu admin əməliyyatlarının real tarixçəsini göstərir. `GET /api/admin/activity` yalnız admin girişinə açıqdır; `action`, `admin`, `from`, `to`, `recordType`, `recordId`, `page` və `size` filterlərini qəbul edir. Tarixlər `YYYY-MM-DD` formatında, UTC günləri kimi hesablanır. Tarixçə üçün dəyişmə və silmə API-si yoxdur. Audit qeydlərində şifrə, CV məzmunu və müraciətlərin şəxsi sahələri saxlanmır.
+
 Lokal frontend başlamazdan əvvəl eyni terminalda `$env:VITE_API_BASE_URL='http://localhost:8080'` təyin edin. Bu public URL-dir, şifrə deyil; alternativ olaraq ignore olunan `.env` faylında saxlayın. Backend 8080 portunda işləməlidir. API boşdursa, bölmələr boş vəziyyət göstərir; backend işləmirsə, xəta mesajı görünür. `npm run test:public` public UI-nin yüklənmə, boş və xəta vəziyyətlərini yoxlayır.
 
 ## Backend və database
@@ -48,7 +50,7 @@ Get-Content ..\.env | ForEach-Object {
 Invoke-RestMethod http://localhost:8080/api/health
 ```
 
-Backend başlananda Flyway `V1`, `V2` və `V3` migration-larını tətbiq edir; Hibernate entity-lərin sxemə uyğunluğunu yoxlayır. PostgreSQL serveri işləməli, göstərilən istifadəçinin database-də cədvəl yaratmaq icazəsi olmalıdır. Health cavabı `{"status":"ok","service":"ibi-backend"}`-dir. Local frontend origin-i dəyişərsə, `CORS_ALLOWED_ORIGINS` dəyişəninə onu ayrıca əlavə edin.
+Backend başlananda Flyway `V1`, `V2`, `V3` və `V4` migration-larını tətbiq edir; Hibernate entity-lərin sxemə uyğunluğunu yoxlayır. PostgreSQL serveri işləməli, göstərilən istifadəçinin database-də cədvəl yaratmaq icazəsi olmalıdır. Health cavabı `{"status":"ok","service":"ibi-backend"}`-dir. Local frontend origin-i dəyişərsə, `CORS_ALLOWED_ORIGINS` dəyişəninə onu ayrıca əlavə edin.
 
 ## Tək lokal nümunə proqram
 
