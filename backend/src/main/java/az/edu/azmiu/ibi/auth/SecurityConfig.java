@@ -2,6 +2,7 @@ package az.edu.azmiu.ibi.auth;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -48,9 +49,19 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository contextRepository) throws Exception {
         http
                 .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.ignoringRequestMatchers(request ->
+                        "POST".equals(request.getMethod()) && Set.of(
+                                "/api/public/applications/programs",
+                                "/api/public/applications/events",
+                                "/api/public/applications/mentors",
+                                "/api/public/applications/startups").contains(
+                                        request.getRequestURI().substring(request.getContextPath().length()))))
                 .securityContext(context -> context.securityContextRepository(contextRepository))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/api/health", "/api/auth/csrf", "/api/public/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/public/applications/programs",
+                                "/api/public/applications/events", "/api/public/applications/mentors",
+                                "/api/public/applications/startups").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

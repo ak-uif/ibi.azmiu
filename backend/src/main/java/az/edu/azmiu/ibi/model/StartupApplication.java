@@ -16,4 +16,8 @@ public class StartupApplication extends ApplicationEntity {
 
     @Column(nullable = false, columnDefinition = "text")
     private String description;
+
+    public void setStartupTitle(String startupTitle) { this.startupTitle = startupTitle; }
+    public void setStage(String stage) { this.stage = stage; }
+    public void setDescription(String description) { this.description = description; }
 }

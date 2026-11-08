@@ -13,4 +13,7 @@ public class ProgramApplication extends ApplicationEntity {
 
     @Column(nullable = false)
     private String faculty;
+
+    public void setSelectedProgram(String selectedProgram) { this.selectedProgram = selectedProgram; }
+    public void setFaculty(String faculty) { this.faculty = faculty; }
 }

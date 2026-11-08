@@ -1,0 +1,85 @@
+package az.edu.azmiu.ibi.content;
+
+import az.edu.azmiu.ibi.model.ApplicationEntity;
+import az.edu.azmiu.ibi.model.EventRegistration;
+import az.edu.azmiu.ibi.model.MentorApplication;
+import az.edu.azmiu.ibi.model.ProgramApplication;
+import az.edu.azmiu.ibi.model.StartupApplication;
+import jakarta.validation.Valid;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/public/applications")
+public class PublicApplicationController {
+    private final ProgramApplicationRepository programs;
+    private final EventRegistrationRepository events;
+    private final MentorApplicationRepository mentors;
+    private final StartupApplicationRepository startups;
+
+    public PublicApplicationController(ProgramApplicationRepository programs, EventRegistrationRepository events,
+            MentorApplicationRepository mentors, StartupApplicationRepository startups) {
+        this.programs = programs;
+        this.events = events;
+        this.mentors = mentors;
+        this.startups = startups;
+    }
+
+    @PostMapping("/programs")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SubmissionResponse program(@Valid @RequestBody ApplicationRequests.Program request) {
+        ProgramApplication entity = common(new ProgramApplication(), request.fullName(), request.email(), request.phone());
+        entity.setSelectedProgram(request.selectedProgram().trim());
+        entity.setFaculty(request.faculty().trim());
+        return saved(programs, entity);
+    }
+
+    @PostMapping("/events")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SubmissionResponse event(@Valid @RequestBody ApplicationRequests.Event request) {
+        EventRegistration entity = common(new EventRegistration(), request.fullName(), request.email(), request.phone());
+        entity.setEventTitle(request.eventTitle().trim());
+        entity.setFormat(request.format());
+        return saved(events, entity);
+    }
+
+    @PostMapping("/mentors")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SubmissionResponse mentor(@Valid @RequestBody ApplicationRequests.Mentor request) {
+        MentorApplication entity = common(new MentorApplication(), request.fullName(), request.email(), request.phone());
+        entity.setCompanyRole(request.companyRole().trim());
+        entity.setExpertise(request.expertise());
+        entity.setLinkedin(request.linkedin().trim());
+        entity.setBio(request.bio().trim());
+        return saved(mentors, entity);
+    }
+
+    @PostMapping("/startups")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SubmissionResponse startup(@Valid @RequestBody ApplicationRequests.Startup request) {
+        StartupApplication entity = common(new StartupApplication(), request.fullName(), request.email(), request.phone());
+        entity.setStartupTitle(request.startupTitle().trim());
+        entity.setStage(request.stage());
+        entity.setDescription(request.description().trim());
+        return saved(startups, entity);
+    }
+
+    private static <T extends ApplicationEntity> T common(T entity, String fullName, String email, String phone) {
+        entity.setFullName(fullName.trim());
+        entity.setEmail(email.trim());
+        entity.setPhone(phone.trim());
+        return entity;
+    }
+
+    private static <T extends ApplicationEntity> SubmissionResponse saved(JpaRepository<T, Long> repository, T entity) {
+        repository.saveAndFlush(entity);
+        return new SubmissionResponse("submitted");
+    }
+
+    public record SubmissionResponse(String status) {}
+}

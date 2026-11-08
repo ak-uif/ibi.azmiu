@@ -17,4 +17,8 @@ public abstract class ApplicationEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String status = "NEW";
+
+    public void setFullName(String fullName) { this.fullName = fullName; }
+    public void setEmail(String email) { this.email = email; }
+    public void setPhone(String phone) { this.phone = phone; }
 }

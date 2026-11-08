@@ -1,4 +1,5 @@
 import { contentTypes, contentStateMarkup, createContentStore, splitPrograms } from './public-content.js';
+import { createApplicationSubmitter } from './public-applications.js';
 
 /**
  * AzMİU İBİ (Innovative Business Incubator) Core Application Engine
@@ -189,6 +190,8 @@ const translations = {
     // Modal Controller & 4 Forms
     modalCloseBtn: "Ləğv et",
     btnSubmitting: "Göndərilir...",
+    formErrorValidation: "Məlumatları yoxlayın:",
+    formErrorServer: "Müraciət göndərilmədi. Bir az sonra yenidən cəhd edin.",
     btnSuccessClose: "Tamamdır",
 
     // Form 1: Idea Submission
@@ -426,6 +429,8 @@ const translations = {
     // Modal Controller & 4 Forms
     modalCloseBtn: "Cancel",
     btnSubmitting: "Submitting...",
+    formErrorValidation: "Please check your details:",
+    formErrorServer: "Your application was not sent. Please try again later.",
     btnSuccessClose: "Done",
 
     // Form 1: Idea Submission
@@ -501,6 +506,7 @@ let MENTORS_DATA = [];
 let PARTNERS_DATA = [];
 
 const contentStore = createContentStore(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
+const applicationSubmitter = createApplicationSubmitter(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
 const publicStates = contentStore.state;
 function renderContentState(container, type, filteredCount = null) {
   const state = publicStates[type].status;
@@ -1542,7 +1548,7 @@ function openModal(type = "idea", data = null, preserveValues = false) {
             class="w-full bg-white border border-slate-200 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-900 text-sm rounded-xl px-4 py-2.5 transition-all outline-none"
           >
             ${PROGRAMS_DATA.map((p) => `
-              <option value="${p.id}" ${p.id === data || p.title[currentLang] === prefillTitle ? "selected" : ""}>
+              <option value="${p.title.az}" ${p.id === Number(data) || p.title[currentLang] === prefillTitle ? "selected" : ""}>
                 ${p.title[currentLang]}
               </option>
             `).join("")}
@@ -1632,7 +1638,7 @@ function openModal(type = "idea", data = null, preserveValues = false) {
             class="w-full bg-white border border-slate-200 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-900 text-sm rounded-xl px-4 py-2.5 transition-all outline-none"
           >
             ${EVENTS_DATA.map((e) => `
-              <option value="${e.id}" ${e.id === data || e.title[currentLang] === eventTitle ? "selected" : ""}>
+              <option value="${e.title.az}" ${e.id === Number(data) || e.title[currentLang] === eventTitle ? "selected" : ""}>
                 ${e.title[currentLang]}
               </option>
             `).join("")}
@@ -1911,8 +1917,9 @@ function closeModal() {
   }, 250);
 }
 
-function handleModalSubmit(e, formType) {
+async function handleModalSubmit(e, formType) {
   e.preventDefault();
+  if (applicationSubmitter.inFlight) return;
   const form = e.currentTarget;
   const submitBtn = form?.querySelector("#modal-submit-btn");
   const container = document.getElementById("dynamic-form-container");
@@ -1923,34 +1930,49 @@ function handleModalSubmit(e, formType) {
   if (!(form instanceof HTMLFormElement) || !submitBtn || !container || !successState) return;
 
   const t = translations[currentLang];
+  form.querySelector('[data-submit-error]')?.remove();
   const originalText = submitBtn.innerHTML;
   submitBtn.disabled = true;
   submitBtn.setAttribute("aria-busy", "true");
   submitBtn.innerHTML = `<span>${t.btnSubmitting}</span>`;
 
-  setTimeout(() => {
+  try {
+    await applicationSubmitter.submit(formType, new FormData(form));
+    if (!form.isConnected || currentActiveModalType !== formType) return;
+
+    // Show success only after the API confirms persistence.
+    const currentText = translations[currentLang];
+    if (formType === "program") {
+      successTitle.textContent = currentText.successTitleProgram;
+      successDesc.textContent = currentText.successDescProgram;
+    } else if (formType === "event") {
+      successTitle.textContent = currentText.successTitleEvent;
+      successDesc.textContent = currentText.successDescEvent;
+    } else if (formType === "mentor") {
+      successTitle.textContent = currentText.successTitleMentor;
+      successDesc.textContent = currentText.successDescMentor;
+    } else {
+      successTitle.textContent = currentText.successTitleIdea;
+      successDesc.textContent = currentText.successDescIdea;
+    }
+    container.classList.add("hidden");
+    successState.classList.remove("hidden");
+  } catch (error) {
+    if (!form.isConnected || error.code === 'in_progress') return;
+    const message = error.code === 'validation_failed'
+      ? `${translations[currentLang].formErrorValidation} ${error.message}`
+      : translations[currentLang].formErrorServer;
+    const alert = document.createElement('p');
+    alert.dataset.submitError = '';
+    alert.setAttribute('role', 'alert');
+    alert.className = 'rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700';
+    alert.textContent = message;
+    submitBtn.parentElement.before(alert);
+  } finally {
     submitBtn.disabled = false;
     submitBtn.removeAttribute("aria-busy");
     submitBtn.innerHTML = originalText;
-
-    // Set custom success messaging according to form type
-    if (formType === "program") {
-      successTitle.textContent = t.successTitleProgram;
-      successDesc.textContent = t.successDescProgram;
-    } else if (formType === "event") {
-      successTitle.textContent = t.successTitleEvent;
-      successDesc.textContent = t.successDescEvent;
-    } else if (formType === "mentor") {
-      successTitle.textContent = t.successTitleMentor;
-      successDesc.textContent = t.successDescMentor;
-    } else {
-      successTitle.textContent = t.successTitleIdea;
-      successDesc.textContent = t.successDescIdea;
-    }
-
-    container.classList.add("hidden");
-    successState.classList.remove("hidden");
-  }, 750);
+  }
 }
 
 // ==========================================

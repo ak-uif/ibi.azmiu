@@ -13,4 +13,7 @@ public class EventRegistration extends ApplicationEntity {
 
     @Column(nullable = false)
     private String format;
+
+    public void setEventTitle(String eventTitle) { this.eventTitle = eventTitle; }
+    public void setFormat(String format) { this.format = format; }
 }

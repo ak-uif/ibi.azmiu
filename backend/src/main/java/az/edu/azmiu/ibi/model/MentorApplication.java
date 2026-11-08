@@ -22,4 +22,9 @@ public class MentorApplication extends ApplicationEntity {
 
     @Column(name = "cv_url", length = 2048)
     private String cvUrl;
+
+    public void setCompanyRole(String companyRole) { this.companyRole = companyRole; }
+    public void setExpertise(String expertise) { this.expertise = expertise; }
+    public void setLinkedin(String linkedin) { this.linkedin = linkedin; }
+    public void setBio(String bio) { this.bio = bio; }
 }
