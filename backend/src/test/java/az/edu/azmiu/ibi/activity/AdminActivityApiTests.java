@@ -1,9 +1,11 @@
 package az.edu.azmiu.ibi.activity;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Optional;
+import java.util.UUID;
 
 import az.edu.azmiu.ibi.auth.AdminUser;
 import az.edu.azmiu.ibi.auth.AdminUserRepository;
@@ -23,6 +25,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -53,6 +57,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class AdminActivityApiTests {
     private static final String ACTOR = "phase12-audit-test";
+    private static final Path STORAGE = Path.of(System.getProperty("java.io.tmpdir"),
+            "ibi-phase14-activity-cvs-" + UUID.randomUUID());
+
+    @DynamicPropertySource
+    static void isolatedStorage(DynamicPropertyRegistry registry) {
+        registry.add("CV_STORAGE_DIR", STORAGE::toString);
+    }
+
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;
     @Autowired PasswordEncoder encoder;

@@ -102,3 +102,40 @@ test('escapes application data in list and detail views', async () => {
   assert.doesNotMatch(panel.markup(), /<script>|<img>/);
   assert.match(panel.markup(), /&lt;script&gt;/);
 });
+
+test('logout discards late application details and private downloads', async () => {
+  let resolveDetail;
+  let resolveDownload;
+  const panel = new ApplicationPanel(() => {}, {
+    get: () => new Promise((done) => { resolveDetail = done; }),
+    download: () => new Promise((done) => { resolveDownload = done; })
+  });
+  const detail = { type: 'mentor', id: 7, fullName: 'Private', hasCv: true };
+  const pendingDetail = panel.openDetail('mentor', 7);
+  panel.cancel();
+  resolveDetail(detail);
+  await pendingDetail;
+  assert.equal(panel.detail, null);
+
+  panel.detail = detail;
+  const pendingCv = panel.downloadCv();
+  panel.cancel();
+  resolveDownload(new Blob(['private CV']));
+  assert.equal(await pendingCv, null);
+  assert.equal(panel.detail, null);
+
+  const pendingCsv = panel.exportCsv();
+  panel.cancel();
+  resolveDownload(new Blob(['private applications']));
+  assert.equal(await pendingCsv, null);
+  assert.equal(panel.error, '');
+});
+
+test('failed CV and CSV downloads show errors without returning files', async () => {
+  const panel = new ApplicationPanel(() => {}, { download: async () => { throw new Error('Download failed'); } });
+  panel.detail = { type: 'mentor', id: 7, hasCv: true };
+  assert.equal(await panel.downloadCv(), null);
+  assert.match(panel.markup(), /Download failed/);
+  assert.equal(await panel.exportCsv(), null);
+  assert.match(panel.markup(), /Download failed/);
+});

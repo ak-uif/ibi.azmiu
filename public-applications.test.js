@@ -58,6 +58,9 @@ test('oversized CV is rejected before request and backend upload errors propagat
 test('success requires a confirmed 201 response', async () => {
   const submitter = createApplicationSubmitter('', async () => ({ ok: true, status: 200, json: async () => ({ status: 'submitted' }) }));
   await assert.rejects(submitter.submit('program', []), { code: 'server_error' });
+  const unconfirmed = createApplicationSubmitter('', async () => ({ ok: true, status: 201,
+    json: async () => ({ status: 'queued' }) }));
+  await assert.rejects(unconfirmed.submit('program', []), { code: 'server_error' });
 });
 
 test('validation and network failures reject without claiming success', async () => {

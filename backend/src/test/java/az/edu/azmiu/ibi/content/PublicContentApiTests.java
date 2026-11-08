@@ -20,6 +20,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -28,6 +29,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class PublicContentApiTests {
     @Autowired MockMvc mvc;
+
+    @Test
+    void emptyTestSchemaHasNoInventedPublicContent() throws Exception {
+        for (String type : new String[]{"programs", "events", "news", "mentors", "startups", "partners"}) {
+            mvc.perform(get("/api/public/" + type).with(anonymous()))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+        }
+    }
 
     @Test
     @WithMockUser(roles = "ADMIN")

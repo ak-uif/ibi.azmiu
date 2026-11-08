@@ -50,8 +50,9 @@ class IbiBackendApplicationTests {
     void databaseMigrationAndEntitiesLoad() throws SQLException {
         Set<String> tables = new HashSet<>();
         try (Connection connection = dataSource.getConnection();
-             ResultSet results = connection.getMetaData().getTables(null, "public", "%", new String[]{"TABLE"})) {
+             ResultSet results = connection.getMetaData().getTables(null, "ibi_phase14_test", "%", new String[]{"TABLE"})) {
             assertTrue(connection.isValid(2));
+            assertEquals("ibi_phase14_test", connection.getSchema());
             while (results.next()) {
                 tables.add(results.getString("TABLE_NAME"));
             }
@@ -60,7 +61,7 @@ class IbiBackendApplicationTests {
         assertTrue(tables.containsAll(Set.of(
                 "programs", "events", "news", "mentors", "startups", "partners",
                 "program_applications", "event_registrations", "mentor_applications", "startup_applications",
-                "admin_users", "admin_activity_log")));
+                "admin_users", "admin_activity_log", "flyway_schema_history")));
         assertEquals("4", flyway.info().current().getVersion().getVersion());
 
         Set<Class<?>> entities = new HashSet<>();

@@ -49,6 +49,7 @@ export class ApplicationPanel {
     this.flash = '';
     this.loaded = false;
     this.requestId = (this.requestId || 0) + 1;
+    this.generation = (this.generation || 0) + 1;
   }
 
   cancel() { this.reset(); }
@@ -108,48 +109,60 @@ export class ApplicationPanel {
   }
 
   async openDetail(type, id) {
+    const generation = this.generation;
     this.busy = true;
     this.error = '';
     this.update();
-    try { this.detail = await this.client.get(`/api/admin/applications/${type}/${id}`); }
-    catch (error) { this.error = error.message; }
-    finally { this.busy = false; this.update(); }
+    try {
+      const detail = await this.client.get(`/api/admin/applications/${type}/${id}`);
+      if (generation === this.generation) this.detail = detail;
+    } catch (error) { if (generation === this.generation) this.error = error.message; }
+    finally { if (generation === this.generation) { this.busy = false; this.update(); } }
   }
 
   closeDetail() { this.detail = null; this.update(); }
 
   async changeStatus(status) {
     if (!this.detail || this.busy) return;
+    const generation = this.generation;
     this.busy = true;
     this.error = '';
     this.flash = '';
     this.update();
     try {
-      this.detail = await this.client.mutate(
+      const detail = await this.client.mutate(
         `/api/admin/applications/${this.detail.type}/${this.detail.id}/status`, 'PATCH', { status });
+      if (generation !== this.generation) return;
+      this.detail = detail;
       this.flash = 'Müraciətin statusu yeniləndi.';
       await this.load();
-    } catch (error) { this.error = error.message; }
-    finally { this.busy = false; this.update(); }
+    } catch (error) { if (generation === this.generation) this.error = error.message; }
+    finally { if (generation === this.generation) { this.busy = false; this.update(); } }
   }
 
   async exportCsv() {
+    const generation = this.generation;
     this.busy = true;
     this.error = '';
     this.update();
-    try { return await this.client.download(`/api/admin/applications/export?${applicationQuery(this.filters, false)}`); }
-    catch (error) { this.error = error.message; return null; }
-    finally { this.busy = false; this.update(); }
+    try {
+      const blob = await this.client.download(`/api/admin/applications/export?${applicationQuery(this.filters, false)}`);
+      return generation === this.generation ? blob : null;
+    } catch (error) { if (generation === this.generation) this.error = error.message; return null; }
+    finally { if (generation === this.generation) { this.busy = false; this.update(); } }
   }
 
   async downloadCv() {
     if (this.detail?.type !== 'mentor' || !this.detail.hasCv) return null;
+    const generation = this.generation;
     this.busy = true;
     this.error = '';
     this.update();
-    try { return await this.client.download(`/api/admin/mentor-applications/${this.detail.id}/cv`); }
-    catch (error) { this.error = error.message; return null; }
-    finally { this.busy = false; this.update(); }
+    try {
+      const blob = await this.client.download(`/api/admin/mentor-applications/${this.detail.id}/cv`);
+      return generation === this.generation ? blob : null;
+    } catch (error) { if (generation === this.generation) this.error = error.message; return null; }
+    finally { if (generation === this.generation) { this.busy = false; this.update(); } }
   }
 
   markup() {
