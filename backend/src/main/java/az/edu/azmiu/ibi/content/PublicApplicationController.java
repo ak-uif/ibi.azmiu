@@ -38,6 +38,7 @@ public class PublicApplicationController {
     @PostMapping("/programs")
     @ResponseStatus(HttpStatus.CREATED)
     public SubmissionResponse program(@Valid @RequestBody ApplicationRequests.Program request) {
+        rejectHoneypot(request.websiteConfirm());
         ProgramApplication entity = common(new ProgramApplication(), request.fullName(), request.email(), request.phone());
         entity.setSelectedProgram(request.selectedProgram().trim());
         entity.setFaculty(request.faculty().trim());
@@ -47,6 +48,7 @@ public class PublicApplicationController {
     @PostMapping("/events")
     @ResponseStatus(HttpStatus.CREATED)
     public SubmissionResponse event(@Valid @RequestBody ApplicationRequests.Event request) {
+        rejectHoneypot(request.websiteConfirm());
         EventRegistration entity = common(new EventRegistration(), request.fullName(), request.email(), request.phone());
         entity.setEventTitle(request.eventTitle().trim());
         entity.setFormat(request.format());
@@ -56,6 +58,7 @@ public class PublicApplicationController {
     @PostMapping(value = "/mentors", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public SubmissionResponse mentor(@Valid @RequestBody ApplicationRequests.Mentor request) {
+        rejectHoneypot(request.websiteConfirm());
         return saved(mentors, mentorEntity(request));
     }
 
@@ -63,6 +66,7 @@ public class PublicApplicationController {
     @ResponseStatus(HttpStatus.CREATED)
     public SubmissionResponse mentorMultipart(@Valid @RequestPart("application") ApplicationRequests.Mentor request,
             @RequestPart(value = "cv", required = false) MultipartFile cv) {
+        rejectHoneypot(request.websiteConfirm());
         MentorApplication entity = mentorEntity(request);
         String key = cv == null ? null : cvStorage.store(cv);
         entity.setCvStorageKey(key);
@@ -77,6 +81,7 @@ public class PublicApplicationController {
     @PostMapping("/startups")
     @ResponseStatus(HttpStatus.CREATED)
     public SubmissionResponse startup(@Valid @RequestBody ApplicationRequests.Startup request) {
+        rejectHoneypot(request.websiteConfirm());
         StartupApplication entity = common(new StartupApplication(), request.fullName(), request.email(), request.phone());
         entity.setStartupTitle(request.startupTitle().trim());
         entity.setStage(request.stage());
@@ -89,6 +94,10 @@ public class PublicApplicationController {
         entity.setEmail(email.trim());
         entity.setPhone(phone.trim());
         return entity;
+    }
+
+    private static void rejectHoneypot(String value) {
+        if (value != null && !value.isBlank()) throw new SpamDetectedException();
     }
 
     private static MentorApplication mentorEntity(ApplicationRequests.Mentor request) {

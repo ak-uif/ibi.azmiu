@@ -192,6 +192,8 @@ const translations = {
     btnSubmitting: "Göndərilir...",
     formErrorValidation: "Məlumatları yoxlayın:",
     formErrorServer: "Müraciət göndərilmədi. Bir az sonra yenidən cəhd edin.",
+    formErrorRateLimit: "Çox müraciət göndərildi. Bir az sonra yenidən cəhd edin.",
+    formErrorSpam: "Müraciət qəbul edilmədi. Formanı yenidən yoxlayın.",
     formErrorCvType: "CV faylı boş, zədələnmiş və ya uyğun olmayan formatdadır. PDF, DOC və ya DOCX seçin.",
     formErrorCvSize: "CV faylı 5 MB-dan böyük olmamalıdır.",
     fieldCv: "CV (istəyə bağlı, PDF/DOC/DOCX, maksimum 5 MB)",
@@ -436,6 +438,8 @@ const translations = {
     btnSubmitting: "Submitting...",
     formErrorValidation: "Please check your details:",
     formErrorServer: "Your application was not sent. Please try again later.",
+    formErrorRateLimit: "Too many submissions. Please try again later.",
+    formErrorSpam: "Your application was not accepted. Please check the form.",
     formErrorCvType: "The CV is empty, damaged or unsupported. Choose a PDF, DOC or DOCX file.",
     formErrorCvSize: "The CV must be 5 MB or smaller.",
     fieldCv: "CV (optional, PDF/DOC/DOCX, maximum 5 MB)",
@@ -1909,6 +1913,7 @@ function openModal(type = "idea", data = null, preserveValues = false) {
     `;
   }
 
+  formHtml = formHtml.replace('</form>', '<div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden"><label>Website<input name="websiteConfirm" type="text" tabindex="-1" autocomplete="off"></label></div></form>');
   container.innerHTML = formHtml;
 
   if (preservedValues) {
@@ -2006,6 +2011,8 @@ async function handleModalSubmit(e, formType) {
     const currentText = translations[currentLang];
     const message = error.code === 'file_too_large' ? currentText.formErrorCvSize
       : error.code === 'invalid_upload' ? currentText.formErrorCvType
+      : error.code === 'rate_limited' ? currentText.formErrorRateLimit
+      : error.code === 'spam_detected' ? currentText.formErrorSpam
       : error.code === 'validation_failed' ? `${currentText.formErrorValidation} ${error.message}`
       : currentText.formErrorServer;
     const alert = document.createElement('p');

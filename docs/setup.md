@@ -52,6 +52,8 @@ Invoke-RestMethod http://localhost:8080/api/health
 
 Backend başlananda Flyway `V1`, `V2`, `V3` və `V4` migration-larını tətbiq edir; Hibernate entity-lərin sxemə uyğunluğunu yoxlayır. PostgreSQL serveri işləməli, göstərilən istifadəçinin database-də cədvəl yaratmaq icazəsi olmalıdır. Health cavabı `{"status":"ok","service":"ibi-backend"}`-dir. Local frontend origin-i dəyişərsə, `CORS_ALLOWED_ORIGINS` dəyişəninə onu ayrıca əlavə edin.
 
+Təhlükəsizlik ayarları: `CORS_ALLOWED_ORIGINS` yalnız konkret origin-lərdən ibarət siyahıdır; production origin-i deploy mühitində ayrıca təyin edin. `PUBLIC_FORM_RATE_LIMIT` (standart 30), `LOGIN_RATE_LIMIT` (standart 10) və `RATE_LIMIT_WINDOW_SECONDS` (standart 60) hər IP üçün sorğu limitlərini idarə edir. `TRUSTED_PROXY_IPS` yalnız birbaşa qoşulan və etibar etdiyiniz reverse proxy IP-ləri üçün istifadə olunur; boş olduqda `X-Forwarded-For` nəzərə alınmır. Production HTTPS arxasında `SESSION_COOKIE_SECURE=true` təyin edin. Bu dəyişənlərə yalnız lokal və ya deploy mühitində dəyər verin; real şifrələri Git-ə göndərməyin.
+
 ## Tək lokal nümunə proqram
 
 Köhnə public frontend nümunələrindən yalnız **Startap Akademiyası: 0-dan MVP-yə** proqramı saxlanılıb. Onu yalnız öz lokal `ibi` database-inizə əl ilə əlavə etmək üçün repo kökündən, `.env` dəyişənlərini terminal prosesinə yüklədikdən sonra bu əmri bir dəfə çalışdırın:

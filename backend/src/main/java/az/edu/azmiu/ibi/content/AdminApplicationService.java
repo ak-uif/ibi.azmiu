@@ -189,8 +189,14 @@ public class AdminApplicationService {
 
     static String csvCell(String value) {
         String safe = value == null ? "" : value;
-        String leading = safe.stripLeading();
-        if (!leading.isEmpty() && "=+-@".indexOf(leading.charAt(0)) >= 0) safe = "'" + safe;
+        int index = 0;
+        while (index < safe.length()) {
+            char character = safe.charAt(index);
+            if (!Character.isWhitespace(character) && !Character.isSpaceChar(character)
+                    && Character.getType(character) != Character.FORMAT) break;
+            index++;
+        }
+        if (index < safe.length() && "=+-@".indexOf(safe.charAt(index)) >= 0) safe = "'" + safe;
         return "\"" + safe.replace("\"", "\"\"") + "\"";
     }
 

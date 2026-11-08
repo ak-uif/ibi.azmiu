@@ -85,4 +85,26 @@ class ContentWebSecurityTests {
                 .andExpect(jsonPath("$.code").value("internal_error"))
                 .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
     }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void corsAllowsConfiguredLocalOriginsAndRejectsUnknownOrigins() throws Exception {
+        when(service.list()).thenReturn(List.of());
+        mvc.perform(get("/api/admin/programs").header("Origin", "http://localhost:5173"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
+        mvc.perform(get("/api/admin/programs").header("Origin", "https://untrusted.example"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void unknownPublicApiAndSensitiveAdminRoutesRemainPrivate() throws Exception {
+        mvc.perform(get("/api/public/applications/mentors/1/cv"))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/admin/applications/export"))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/admin/activity"))
+                .andExpect(status().isUnauthorized());
+    }
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
@@ -15,13 +17,14 @@ public final class ContentDtos {
 
     public record ProgramRequest(
             @Size(max = 255) String category,
-            @NotBlank @Size(max = 255) String status,
+            @NotBlank @Pattern(regexp = "(?i:draft|open|active|soon|archived)",
+                    message = "must be draft, open, active, soon or archived") String status,
             @NotBlank @Size(max = 255) String titleAz,
             @Size(max = 255) String titleEn,
-            @NotBlank String descriptionAz,
-            String descriptionEn,
-            String detailsAz,
-            String detailsEn,
+            @NotBlank @Size(max = 10000) String descriptionAz,
+            @Size(max = 10000) String descriptionEn,
+            @Size(max = 20000) String detailsAz,
+            @Size(max = 20000) String detailsEn,
             @Size(max = 255) String durationAz,
             @Size(max = 255) String durationEn,
             @Size(max = 255) String audienceAz,
@@ -69,10 +72,10 @@ public final class ContentDtos {
             @Size(max = 255) String attendees,
             @Size(max = 255) String speakerAz,
             @Size(max = 255) String speakerEn,
-            @NotBlank String descriptionAz,
-            String descriptionEn,
-            String detailsAz,
-            String detailsEn,
+            @NotBlank @Size(max = 10000) String descriptionAz,
+            @Size(max = 10000) String descriptionEn,
+            @Size(max = 20000) String detailsAz,
+            @Size(max = 20000) String detailsEn,
             Boolean published) {
     }
 
@@ -106,10 +109,10 @@ public final class ContentDtos {
             @Size(max = 255) String dateEn,
             @NotBlank @Size(max = 255) String titleAz,
             @Size(max = 255) String titleEn,
-            String summaryAz,
-            String summaryEn,
-            String fullTextAz,
-            String fullTextEn,
+            @Size(max = 2000) String summaryAz,
+            @Size(max = 2000) String summaryEn,
+            @Size(max = 20000) String fullTextAz,
+            @Size(max = 20000) String fullTextEn,
             @Size(max = 2048) String imageUrl,
             Boolean published) {
     }
@@ -137,7 +140,7 @@ public final class ContentDtos {
             @Size(max = 255) String roleAz,
             @Size(max = 255) String roleEn,
             @Size(max = 255) String category,
-            List<String> skills,
+            @Size(max = 30) List<@NotBlank @Size(max = 100) String> skills,
             @Size(max = 2048) String avatarUrl,
             @Size(max = 2048) String linkedinUrl,
             @Size(max = 2048) String githubUrl,
@@ -167,13 +170,13 @@ public final class ContentDtos {
             @Size(max = 255) String taglineEn,
             @Size(max = 255) String stageAz,
             @Size(max = 255) String stageEn,
-            @PositiveOrZero Integer members,
-            @NotBlank String descriptionAz,
-            String descriptionEn,
-            List<Map<String, Object>> founders,
-            List<String> techStack,
-            String tractionAz,
-            String tractionEn,
+            @PositiveOrZero @Max(10000) Integer members,
+            @NotBlank @Size(max = 10000) String descriptionAz,
+            @Size(max = 10000) String descriptionEn,
+            @Size(max = 20) List<Map<String, Object>> founders,
+            @Size(max = 30) List<@NotBlank @Size(max = 100) String> techStack,
+            @Size(max = 2000) String tractionAz,
+            @Size(max = 2000) String tractionEn,
             @Size(max = 2048) String website,
             Boolean published) {
     }

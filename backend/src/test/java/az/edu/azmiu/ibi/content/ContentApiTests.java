@@ -33,6 +33,18 @@ class ContentApiTests {
     @Autowired
     private MockMvc mvc;
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void adminContentRejectsUnsupportedStatusAndOversizedText() throws Exception {
+        mvc.perform(post("/api/admin/programs").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"status\":\"UNSUPPORTED\",\"titleAz\":\"Example\",\"descriptionAz\":\"Text\"}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("validation_failed"));
+        mvc.perform(post("/api/admin/programs").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"status\":\"DRAFT\",\"titleAz\":\"Example\",\"descriptionAz\":\""
+                        + "x".repeat(10001) + "\"}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("validation_failed"));
+    }
+
     static Stream<ResourceCase> resources() {
         return Stream.of(
                 new ResourceCase("programs",

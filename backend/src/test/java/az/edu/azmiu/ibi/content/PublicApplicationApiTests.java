@@ -6,12 +6,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,7 +69,47 @@ class PublicApplicationApiTests {
         mvc.perform(post("/api/public/applications/startups").contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
                 .andExpect(status().isBadRequest());
-        mvc.perform(get("/api/public/applications/programs")).andExpect(status().isMethodNotAllowed());
+        mvc.perform(get("/api/public/applications/programs")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/admin/programs")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void honeypotAndInvalidPhoneAreRejectedWithoutSaving() throws Exception {
+        Integer before = jdbc.queryForObject("SELECT count(*) FROM program_applications", Integer.class);
+        mvc.perform(post("/api/public/applications/programs").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"fullName\":\"Example Person\",\"email\":\"safe@example.com\",\"phone\":\"1234567\","
+                        + "\"selectedProgram\":\"Example\",\"faculty\":\"Architecture\",\"websiteConfirm\":\"spam\"}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("spam_detected"));
+        mvc.perform(post("/api/public/applications/programs").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"fullName\":\"Example Person\",\"email\":\"safe@example.com\",\"phone\":\"invalid-phone\","
+                        + "\"selectedProgram\":\"Example\",\"faculty\":\"Architecture\"}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("validation_failed"));
+        assertEquals(before, jdbc.queryForObject("SELECT count(*) FROM program_applications", Integer.class));
+    }
+
+    @Test
+    void honeypotRejectsEveryPublicFormWithoutSaving() throws Exception {
+        String[][] cases = {
+                {"events", "event_registrations", "\"eventTitle\":\"Example\",\"format\":\"online\""},
+                {"startups", "startup_applications", "\"startupTitle\":\"Example\",\"stage\":\"mvp\",\"description\":\"Idea\""}
+        };
+        for (String[] testCase : cases) {
+            Integer before = jdbc.queryForObject("SELECT count(*) FROM " + testCase[1], Integer.class);
+            String body = "{\"fullName\":\"Example Person\",\"email\":\"safe@example.com\",\"phone\":\"1234567\","
+                    + testCase[2] + ",\"websiteConfirm\":\"spam\"}";
+            mvc.perform(post("/api/public/applications/" + testCase[0]).contentType(MediaType.APPLICATION_JSON)
+                    .content(body)).andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("spam_detected"));
+            assertEquals(before, jdbc.queryForObject("SELECT count(*) FROM " + testCase[1], Integer.class));
+        }
+        Integer before = jdbc.queryForObject("SELECT count(*) FROM mentor_applications", Integer.class);
+        String mentor = "{\"fullName\":\"Example Person\",\"email\":\"safe@example.com\",\"phone\":\"1234567\","
+                + "\"companyRole\":\"Designer\",\"expertise\":\"design\",\"linkedin\":\"https://linkedin.com/in/example\","
+                + "\"bio\":\"Mentorship experience\",\"websiteConfirm\":\"spam\"}";
+        mvc.perform(multipart("/api/public/applications/mentors")
+                .file(new MockMultipartFile("application", "", MediaType.APPLICATION_JSON_VALUE,
+                        mentor.getBytes(java.nio.charset.StandardCharsets.UTF_8))))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("spam_detected"));
+        assertEquals(before, jdbc.queryForObject("SELECT count(*) FROM mentor_applications", Integer.class));
     }
 }

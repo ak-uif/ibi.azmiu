@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Locale;
@@ -58,12 +59,14 @@ public class MentorCvStorage {
     }
 
     public StoredCv read(String key) {
-        if (key == null || !key.matches("[0-9a-f]{32}\\.(pdf|doc|docx)")) {
+        if (!validKey(key)) {
             throw new RecordNotFoundException("CV");
         }
         Path path = root.resolve(key);
         try {
-            if (!Files.isRegularFile(path) || Files.size(path) > MAX_BYTES) throw new RecordNotFoundException("CV");
+            if (!Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) || Files.size(path) > MAX_BYTES) {
+                throw new RecordNotFoundException("CV");
+            }
             return new StoredCv(Files.readAllBytes(path), MediaType.parseMediaType(contentType(extension(key))), extension(key));
         } catch (IOException exception) {
             throw new RecordNotFoundException("CV");
@@ -71,9 +74,13 @@ public class MentorCvStorage {
     }
 
     public void delete(String key) {
-        if (key == null) return;
+        if (!validKey(key)) return;
         try { Files.deleteIfExists(root.resolve(key)); }
         catch (IOException ignored) { /* Keep the original persistence failure. */ }
+    }
+
+    private static boolean validKey(String key) {
+        return key != null && key.matches("[0-9a-f]{32}\\.(pdf|doc|docx)");
     }
 
     private static String extension(String name) {

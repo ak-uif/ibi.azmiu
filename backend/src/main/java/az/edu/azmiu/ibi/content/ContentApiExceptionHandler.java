@@ -10,8 +10,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-@RestControllerAdvice(basePackages = {"az.edu.azmiu.ibi.content", "az.edu.azmiu.ibi.activity"})
+@RestControllerAdvice(basePackages = {"az.edu.azmiu.ibi.content", "az.edu.azmiu.ibi.activity",
+        "az.edu.azmiu.ibi.auth"})
 public class ContentApiExceptionHandler {
+
+    @ExceptionHandler(SpamDetectedException.class)
+    ResponseEntity<ApiError> spam(SpamDetectedException exception) {
+        return ResponseEntity.badRequest().body(new ApiError("spam_detected", "Submission was not accepted"));
+    }
 
     @ExceptionHandler(RecordNotFoundException.class)
     ResponseEntity<ApiError> notFound(RecordNotFoundException exception) {

@@ -70,6 +70,18 @@ test('validation and network failures reject without claiming success', async ()
   assert.equal(offline.inFlight, false);
 });
 
+test('honeypot field is sent and rate-limit feedback reaches the form', async () => {
+  let body;
+  const submitter = createApplicationSubmitter('', async (_, options) => {
+    body = options.body;
+    return { ok: false, status: 429, json: async () => ({ code: 'rate_limited', message: 'Try later' }) };
+  });
+  await assert.rejects(submitter.submit('program', [['fullName', 'A'], ['websiteConfirm', '']]),
+    { code: 'rate_limited' });
+  assert.equal(JSON.parse(body).websiteConfirm, '');
+  assert.equal(submitter.inFlight, false);
+});
+
 test('repeated click cannot create a second request while the first is pending', async () => {
   let resolve;
   let calls = 0;

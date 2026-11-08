@@ -44,7 +44,8 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest credentials,
             HttpServletRequest request, HttpServletResponse response) {
         if (credentials.username() == null || credentials.username().isBlank()
-                || credentials.password() == null || credentials.password().isBlank()) {
+                || credentials.password() == null || credentials.password().isBlank()
+                || credentials.username().length() > 255 || credentials.password().length() > 1024) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "İstifadəçi adı və ya şifrə yanlışdır."));
         }

@@ -1,5 +1,6 @@
 package az.edu.azmiu.ibi.auth;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +59,9 @@ public class SecurityConfig {
                                         request.getRequestURI().substring(request.getContextPath().length()))))
                 .securityContext(context -> context.securityContextRepository(contextRepository))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/api/health", "/api/auth/csrf", "/api/public/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/health", "/api/auth/csrf",
+                                "/api/public/programs", "/api/public/events", "/api/public/news",
+                                "/api/public/mentors", "/api/public/startups", "/api/public/partners").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/public/applications/programs",
                                 "/api/public/applications/events", "/api/public/applications/mentors",
                                 "/api/public/applications/startups").permitAll()
@@ -90,6 +93,16 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         List<String> origins = Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim).filter(origin -> !origin.isEmpty()).toList();
+        for (String origin : origins) {
+            URI uri;
+            try { uri = URI.create(origin); }
+            catch (IllegalArgumentException exception) { throw new IllegalArgumentException("Invalid CORS origin"); }
+            if ((!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme())) || uri.getHost() == null
+                    || uri.getUserInfo() != null || (uri.getRawPath() != null && !uri.getRawPath().isEmpty())
+                    || uri.getRawQuery() != null || uri.getRawFragment() != null || origin.contains("*")) {
+                throw new IllegalArgumentException("CORS origins must be explicit http(s) origins");
+            }
+        }
         configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Content-Type", "X-CSRF-TOKEN"));

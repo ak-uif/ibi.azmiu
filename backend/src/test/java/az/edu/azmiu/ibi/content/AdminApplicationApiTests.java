@@ -30,6 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 class AdminApplicationApiTests {
+
+    @Test
+    void csvEscapesFormulaPrefixesBehindInvisibleCharacters() {
+        assertEquals("\"'\uFEFF=1+1\"", AdminApplicationService.csvCell("\uFEFF=1+1"));
+        assertEquals("\"'\t+1\"", AdminApplicationService.csvCell("\t+1"));
+        assertEquals("\"normal\"", AdminApplicationService.csvCell("normal"));
+    }
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;
     @Autowired EntityManager entityManager;

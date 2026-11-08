@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -48,6 +49,13 @@ class MentorCvApiTests {
 
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;
+    @Autowired MentorCvStorage storage;
+
+    @Test
+    void storageKeyCannotTraverseOutsideCvDirectory() {
+        assertThrows(RecordNotFoundException.class, () -> storage.read("../outside.pdf"));
+        storage.delete("../outside.pdf");
+    }
 
     @DynamicPropertySource
     static void storage(DynamicPropertyRegistry registry) {
@@ -104,7 +112,7 @@ class MentorCvApiTests {
         mvc.perform(get("/api/admin/mentor-applications"))
                 .andExpect(status().isUnauthorized());
         mvc.perform(get("/api/public/applications/mentors/" + id + "/cv"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isUnauthorized());
         mvc.perform(get("/api/admin/mentor-applications/" + id + "/cv")
                 .with(user("visitor").roles("USER"))).andExpect(status().isForbidden());
         byte[] downloaded = mvc.perform(get("/api/admin/mentor-applications/" + id + "/cv")
