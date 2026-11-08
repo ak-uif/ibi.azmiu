@@ -16,4 +16,6 @@ public class EventRegistration extends ApplicationEntity {
 
     public void setEventTitle(String eventTitle) { this.eventTitle = eventTitle; }
     public void setFormat(String format) { this.format = format; }
+    public String getEventTitle() { return eventTitle; }
+    public String getFormat() { return format; }
 }

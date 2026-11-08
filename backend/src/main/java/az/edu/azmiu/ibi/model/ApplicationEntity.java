@@ -25,4 +25,5 @@ public abstract class ApplicationEntity extends BaseEntity {
     public String getEmail() { return email; }
     public String getPhone() { return phone; }
     public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

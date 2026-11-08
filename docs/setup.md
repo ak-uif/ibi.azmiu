@@ -27,6 +27,8 @@ npm run build
 
 Vite terminalda local ünvanı göstərir. `/admin` real backend login-inə qoşulur. Admin panelində proqram, tədbir, xəbər, mentor, startap və partnyor qeydləri lokal backend API-sindən idarə olunur. Public sayt həmin altı bölməni `/api/public/*` ünvanlarından oxuyur. Proqramlarda `open`, `active`, `soon` statusları; qalan beş bölmədə yalnız `published=true` qeydləri görünür. `draft`, `archived` və yayımlanmamış qeydlər public API-yə düşmür. Dörd public müraciət forması database-ə yazılır; mentor CV-si istəyə bağlıdır.
 
+`/admin/applications` səhifəsində admin dörd növ müraciəti axtara, növ və statusa görə süzə, tarixə görə sıralaya, səhifələyə, detallara baxa və statusu dəyişə bilər. CSV düyməsi seçilmiş filterlərin bütün nəticələrini endirir. Mentor CV-si yalnız admin sessiyası ilə ayrıca endirilir. Bu sorğular `/api/admin/applications` altında qorunur; statuslar `NEW`, `REVIEWING`, `ACCEPTED`, `REJECTED`, `ARCHIVED`-dir.
+
 Lokal frontend başlamazdan əvvəl eyni terminalda `$env:VITE_API_BASE_URL='http://localhost:8080'` təyin edin. Bu public URL-dir, şifrə deyil; alternativ olaraq ignore olunan `.env` faylında saxlayın. Backend 8080 portunda işləməlidir. API boşdursa, bölmələr boş vəziyyət göstərir; backend işləmirsə, xəta mesajı görünür. `npm run test:public` public UI-nin yüklənmə, boş və xəta vəziyyətlərini yoxlayır.
 
 ## Backend və database

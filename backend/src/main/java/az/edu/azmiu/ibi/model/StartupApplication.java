@@ -20,4 +20,7 @@ public class StartupApplication extends ApplicationEntity {
     public void setStartupTitle(String startupTitle) { this.startupTitle = startupTitle; }
     public void setStage(String stage) { this.stage = stage; }
     public void setDescription(String description) { this.description = description; }
+    public String getStartupTitle() { return startupTitle; }
+    public String getStage() { return stage; }
+    public String getDescription() { return description; }
 }

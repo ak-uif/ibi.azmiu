@@ -3,6 +3,7 @@ import './admin.css';
 import { api } from './api.js';
 import { contentConfig } from './content-config.js';
 import { ContentPanel, escapeHtml } from './panel-content.js';
+import { ApplicationPanel } from './applications.js';
 
 const app = document.querySelector('#admin-app');
 let authState = 'unknown';
@@ -18,7 +19,6 @@ const sections = [
   { slug: 'activity', label: 'Fəaliyyət tarixçəsi', icon: 'clock' },
   { slug: 'settings', label: 'Ayarlar', icon: 'settings' }
 ];
-const applicationTabs = ['Bütün müraciətlər', 'Proqramlar', 'Tədbirlər', 'Mentorlar', 'Startaplar'];
 const icons = {
   grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
   inbox: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 13h5l2 3h4l2-3h5"/>',
@@ -43,9 +43,9 @@ const icons = {
 };
 const icon = (name, size = 20) => `<svg aria-hidden="true" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`;
 
-const state = { tab: 0, menuOpen: false, dashboard: null, dashboardLoading: false, dashboardError: '',
-  mentorApplications: null, mentorDetail: null, mentorLoading: false, mentorError: '' };
+const state = { menuOpen: false, dashboard: null, dashboardLoading: false, dashboardError: '' };
 const contentPanel = new ContentPanel(() => { if (contentConfig[route()]) render(); });
+const applicationPanel = new ApplicationPanel(() => { if (route() === 'applications') render(); });
 const route = () => {
   const match = location.pathname.match(/^\/admin\/([^/]+)\/?$/);
   return match && sections.some((item) => item.slug === match[1]) ? match[1] : null;
@@ -132,14 +132,14 @@ function dashboard() {
   const data = state.dashboard;
   if (!data) return '';
   const stats = [
-    ['Ümumi müraciətlər', '—', 'inbox', 'Müraciət API-si hələ qoşulmayıb'],
-    ['Yeni müraciətlər', '—', 'file', 'Müraciət API-si hələ qoşulmayıb'],
+    ['Ümumi müraciətlər', data.applications.total, 'inbox', 'Database göstəricisi'],
+    ['Yeni müraciətlər', data.newApplications.total, 'file', 'Database göstəricisi'],
     ['Aktiv proqramlar', data.programs.filter((item) => ['active', 'open'].includes(item.status)).length, 'layers', 'Database göstəricisi'],
     ['Dərc edilmiş tədbirlər', data.events.filter((item) => item.published).length, 'calendar', 'Database göstəricisi']
   ];
   return `<div class="admin-stats">${stats.map(([label, count, symbol, note]) => `<article class="admin-card admin-stat"><span class="admin-stat-icon">${icon(symbol)}</span><p>${label}</p><strong>${count}</strong><small>${note}</small></article>`).join('')}</div>
     <div class="admin-dashboard-grid"><section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">MƏZMUN</span><h2>Son proqramlar</h2></div><a href="/admin/programs" data-route="programs">Hamısına bax ${icon('arrow', 16)}</a></div>${data.programs.length ? data.programs.slice(-4).reverse().map((item) => `<div class="admin-list-row"><span class="admin-activity-icon">${icon('layers', 18)}</span><div><strong>${escapeHtml(item.titleAz)}</strong><small>${escapeHtml(item.status)}</small></div></div>`).join('') : '<p class="admin-empty-note">Hələ proqram yoxdur.</p>'}</section>
-    <section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">MÜRACİƏTLƏR</span><h2>Son müraciətlər</h2></div></div><p class="admin-empty-note">Müraciət API-si hələ qoşulmayıb.</p></section>
+    <section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">MÜRACİƏTLƏR</span><h2>Son müraciətlər</h2></div><a href="/admin/applications" data-route="applications">Hamısına bax ${icon('arrow', 16)}</a></div>${data.applications.items.length ? data.applications.items.map((item) => `<div class="admin-list-row"><span class="admin-activity-icon">${icon('inbox', 18)}</span><div><strong>${escapeHtml(item.fullName)}</strong><small>${escapeHtml(item.title)} · ${escapeHtml(item.status)}</small></div></div>`).join('') : '<p class="admin-empty-note">Hələ müraciət yoxdur.</p>'}</section>
     <section class="admin-card admin-list-card"><div class="admin-card-heading"><div><span class="admin-eyebrow">PANEL</span><h2>Son admin fəaliyyətləri</h2></div></div><p class="admin-empty-note">Fəaliyyət tarixçəsi API-si hələ yoxdur.</p></section></div>`;
 }
 
@@ -148,62 +148,20 @@ async function loadDashboard() {
   state.dashboardError = '';
   render();
   try {
-    const [programs, events] = await Promise.all([api.get('/api/admin/programs'), api.get('/api/admin/events')]);
-    state.dashboard = { programs, events };
+    const [programs, events, applications, newApplications] = await Promise.all([
+      api.get('/api/admin/programs'), api.get('/api/admin/events'),
+      api.get('/api/admin/applications?page=0&size=4'),
+      api.get('/api/admin/applications?status=NEW&page=0&size=1')
+    ]);
+    state.dashboard = { programs, events, applications, newApplications };
   } catch (error) { state.dashboardError = error.message; }
   finally { state.dashboardLoading = false; if (route() === 'dashboard') render(); }
 }
 
 function sectionContent(slug) {
   if (contentConfig[slug]) return contentPanel.markup(slug);
-  const tabs = slug === 'applications' ? `<div class="admin-tabs" role="tablist" aria-label="Müraciət növü">${applicationTabs.map((tab, index) => `<button type="button" role="tab" aria-selected="${state.tab === index}" class="${state.tab === index ? 'active' : ''}" data-tab="${index}">${tab}</button>`).join('')}</div>` : '';
-  if (slug === 'applications' && state.tab === 3) return tabs + mentorCvContent();
-  return `${tabs}<div class="admin-card admin-section-card"><div class="admin-state"><h2>Bu bölmə hələ API-yə qoşulmayıb</h2><p>Məlumatlar hazır olduqda burada görünəcək.</p></div></div>`;
-}
-
-function mentorCvContent() {
-  if (state.mentorLoading) return '<div class="admin-card admin-state" role="status"><span class="admin-spinner"></span><p>Mentor müraciətləri yüklənir...</p></div>';
-  if (state.mentorError) return `<div class="admin-card admin-state" role="alert"><p>${escapeHtml(state.mentorError)}</p><button type="button" class="admin-outline-button" id="mentor-retry">Yenidən yoxla</button></div>`;
-  const rows = state.mentorApplications || [];
-  const detail = state.mentorDetail;
-  const detailMarkup = detail ? `<section class="admin-card admin-section-card" aria-label="Mentor müraciəti"><h2>${escapeHtml(detail.fullName)}</h2><p>${escapeHtml(detail.email)} · ${escapeHtml(detail.phone)}</p><p>${escapeHtml(detail.companyRole)} · ${escapeHtml(detail.expertise)}</p><p>${escapeHtml(detail.bio)}</p>${detail.hasCv ? `<button type="button" class="btn-primary" data-cv-id="${detail.id}">CV-ni endir</button>` : '<p>CV əlavə edilməyib.</p>'}</section>` : '';
-  return `<div class="admin-card admin-section-card"><h2>Mentor müraciətləri</h2>${rows.length ? rows.map((row) => `<div class="admin-list-row"><div><strong>${escapeHtml(row.fullName)}</strong><small>${row.hasCv ? 'CV əlavə olunub' : 'CV yoxdur'}</small></div><button type="button" class="admin-outline-button" data-mentor-id="${row.id}">Ətraflı bax</button></div>`).join('') : '<p class="admin-empty-note">Hələ mentor müraciəti yoxdur.</p>'}</div>${detailMarkup}`;
-}
-
-async function loadMentorApplications() {
-  state.mentorLoading = true;
-  state.mentorError = '';
-  render();
-  try { state.mentorApplications = await api.get('/api/admin/mentor-applications'); }
-  catch (error) { state.mentorError = error.message; }
-  finally { state.mentorLoading = false; if (route() === 'applications') render(); }
-}
-
-async function loadMentorDetail(id) {
-  state.mentorLoading = true;
-  render();
-  try { state.mentorDetail = await api.get(`/api/admin/mentor-applications/${id}`); }
-  catch (error) { state.mentorError = error.message; }
-  finally { state.mentorLoading = false; if (route() === 'applications') render(); }
-}
-
-async function downloadMentorCv(id, button) {
-  button.disabled = true;
-  try {
-    const blob = await api.download(`/api/admin/mentor-applications/${id}/cv`);
-    const extension = blob.type === 'application/pdf' ? 'pdf' : blob.type === 'application/msword' ? 'doc' : 'docx';
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `mentor-cv.${extension}`;
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  } catch (error) {
-    state.mentorError = error.message;
-    render();
-  } finally { button.disabled = false; }
+  if (slug === 'applications') return applicationPanel.markup();
+  return '<div class="admin-card admin-section-card"><div class="admin-state"><h2>Bu bölmə hələ API-yə qoşulmayıb</h2><p>Məlumatlar hazır olduqda burada görünəcək.</p></div></div>';
 }
 
 function renderPanel(slug) {
@@ -220,7 +178,7 @@ function renderPanel(slug) {
       </aside>
       <div class="admin-main">
         <header class="admin-topbar"><button class="admin-menu-button" type="button" id="menu-button" aria-label="Menyunu aç" aria-expanded="${state.menuOpen}">${icon('menu')}</button><div class="admin-breadcrumb">İdarəetmə paneli <span>/</span> <strong>${item.label}</strong></div><span class="admin-topbar-badge">ADMIN</span></header>
-        <main class="admin-content"><div class="admin-page-head"><div><span class="admin-eyebrow">AZMİU İBİ / ADMIN</span><h1>${item.label}</h1><p>${slug === 'dashboard' ? 'İnkubatorun fəaliyyətinə ümumi baxış' : contentConfig[slug] ? 'Database qeydlərini idarə edin' : 'Bölmə görünüşü'}</p></div><span class="admin-page-label">${contentConfig[slug] || slug === 'dashboard' ? 'Lokal məlumatlar' : 'Hazırlanır'}</span></div>
+        <main class="admin-content"><div class="admin-page-head"><div><span class="admin-eyebrow">AZMİU İBİ / ADMIN</span><h1>${item.label}</h1><p>${slug === 'dashboard' ? 'İnkubatorun fəaliyyətinə ümumi baxış' : contentConfig[slug] || slug === 'applications' ? 'Database qeydlərini idarə edin' : 'Bölmə görünüşü'}</p></div><span class="admin-page-label">${contentConfig[slug] || slug === 'dashboard' || slug === 'applications' ? 'Lokal məlumatlar' : 'Hazırlanır'}</span></div>
           ${slug === 'dashboard' ? dashboard() : sectionContent(slug)}
         </main>
       </div>
@@ -235,6 +193,7 @@ function renderPanel(slug) {
       await api.mutate('/api/auth/logout', 'POST');
       authState = 'guest';
       contentPanel.cancel();
+      applicationPanel.cancel();
       state.dashboard = null;
       state.dashboardError = '';
       state.menuOpen = false;
@@ -254,26 +213,17 @@ function renderPanel(slug) {
     render();
   }));
   if (contentConfig[slug]) contentPanel.bind(app);
+  else if (slug === 'applications') applicationPanel.bind(app);
   else if (slug === 'dashboard') {
     document.querySelector('#dashboard-retry')?.addEventListener('click', loadDashboard);
-  } else {
-    document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('click', () => {
-      state.tab = Number(tab.dataset.tab);
-      render();
-    }));
-    if (slug === 'applications') {
-      document.querySelector('#mentor-retry')?.addEventListener('click', loadMentorApplications);
-      document.querySelectorAll('[data-mentor-id]').forEach((button) => button.addEventListener('click', () => loadMentorDetail(Number(button.dataset.mentorId))));
-      document.querySelectorAll('[data-cv-id]').forEach((button) => button.addEventListener('click', () => downloadMentorCv(Number(button.dataset.cvId), button)));
-    }
   }
 }
 
 function navigate(slug) {
   if (authState !== 'authenticated' || !sections.some((section) => section.slug === slug)) return;
   state.menuOpen = false;
-  state.tab = 0;
   if (slug === 'dashboard') { state.dashboard = null; state.dashboardError = ''; }
+  if (slug === 'applications') applicationPanel.loaded = false;
   history.pushState({}, '', `/admin/${slug}`);
   render();
   window.scrollTo(0, 0);
@@ -293,7 +243,7 @@ function render() {
     renderPanel(slug);
     if (contentConfig[slug] && contentPanel.slug !== slug) contentPanel.load(slug, true);
     if (slug === 'dashboard' && !state.dashboard && !state.dashboardLoading && !state.dashboardError) loadDashboard();
-    if (slug === 'applications' && state.tab === 3 && !state.mentorApplications && !state.mentorLoading && !state.mentorError) loadMentorApplications();
+    if (slug === 'applications' && !applicationPanel.loaded) applicationPanel.load();
   }
 }
 
@@ -301,6 +251,7 @@ window.addEventListener('admin-session-expired', () => {
   if (authState === 'unknown') return;
   authState = 'guest';
   contentPanel.cancel();
+  applicationPanel.cancel();
   state.dashboard = null;
   state.dashboardError = '';
   history.replaceState({}, '', '/admin');

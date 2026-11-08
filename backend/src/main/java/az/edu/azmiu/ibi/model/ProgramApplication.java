@@ -16,4 +16,6 @@ public class ProgramApplication extends ApplicationEntity {
 
     public void setSelectedProgram(String selectedProgram) { this.selectedProgram = selectedProgram; }
     public void setFaculty(String faculty) { this.faculty = faculty; }
+    public String getSelectedProgram() { return selectedProgram; }
+    public String getFaculty() { return faculty; }
 }
